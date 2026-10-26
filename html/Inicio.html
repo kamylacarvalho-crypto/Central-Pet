@@ -1,0 +1,3343 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Central Pet - Informação, proteção animal, adoção, denúncias e doações.">
+
+  <title>Central Pet - Proteção Animal</title>
+
+  <!-- =====================================================
+         TAILWIND
+    ====================================================== -->
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pet: {
+              orange: '#FFA56D',
+              red: '#E00808',
+              blue: '#0600A9',
+              cream: '#FFEFE5',
+              beige: '#E4B99E',
+              yellow: '#EEEE82'
+            }
+          },
+
+          keyframes: {
+            fadeInDown: {
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(-10px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              }
+            },
+
+            fadeInUp: {
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(20px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              }
+            }
+          },
+
+          animation: {
+            fadeInDown: 'fadeInDown .25s ease-out',
+            fadeInUp: 'fadeInUp .7s ease-out'
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- =====================================================
+         FONTES
+    ====================================================== -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- =====================================================
+         LUCIDE
+    ====================================================== -->
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+
+<body class="
+        overflow-x-hidden
+        bg-pet-cream
+        font-['Roboto']
+        text-gray-900
+    ">
+
+
+  <!-- =====================================================
+         NAVBAR
+         MANTIDA COM ENTRAR + CRIAR CONTA
+    ====================================================== -->
+
+  <header id="header" class="
+            fixed
+            left-0
+            right-0
+            top-0
+            z-50
+            border-b
+            border-transparent
+            bg-pet-orange/95
+            backdrop-blur-md
+            transition-all
+            duration-300
+        ">
+
+    <div class="
+                mx-auto
+                flex
+                h-[76px]
+                max-w-[1200px]
+                items-center
+                justify-between
+                px-5
+                lg:px-8
+            ">
+
+      <!-- LOGO -->
+
+      <a href="#inicio" class="
+                    group
+                    flex
+                    items-center
+                    gap-3
+                ">
+
+        <img src="../img/logo-centralpet.png" alt="Central Pet" class="
+                        h-11
+                        w-11
+                        object-contain
+                        transition-transform
+                        duration-300
+                        group-hover:scale-105
+                    ">
+
+        <div class="hidden sm:block">
+
+          <strong class="
+                            block
+                            text-[17px]
+                            font-black
+                            leading-none
+                            text-gray-900
+                        ">
+            Central Pet
+          </strong>
+
+          <span class="
+                            mt-1
+                            block
+                            text-[9px]
+                            font-medium
+                            text-gray-700
+                        ">
+            Informação e proteção animal
+          </span>
+
+        </div>
+
+      </a>
+
+
+      <!-- NAV DESKTOP -->
+
+      <nav class="
+                    hidden
+                    items-center
+                    gap-1
+                    lg:flex
+                ">
+
+        <a href="#inicio" data-nav="inicio" class="
+                        nav-link
+                        rounded-lg
+                        px-3
+                        py-2
+                        text-[12px]
+                        font-bold
+                        text-gray-700
+                        transition-all
+                        duration-200
+                        hover:bg-[#FFEFE5]
+                        hover:text-pet-red
+                    ">
+          Início
+        </a>
+
+
+        <a href="#sobre" data-nav="sobre" class="
+                        nav-link
+                        rounded-lg
+                        px-3
+                        py-2
+                        text-[12px]
+                        font-bold
+                        text-gray-700
+                        transition-all
+                        duration-200
+                        hover:bg-[#FFEFE5]
+                        hover:text-pet-red
+                    ">
+          Sobre
+        </a>
+
+
+        <a href="#denuncia" data-nav="denuncia" class="
+                        nav-link
+                        rounded-lg
+                        px-3
+                        py-2
+                        text-[12px]
+                        font-bold
+                        text-gray-700
+                        transition-all
+                        duration-200
+                        hover:bg-[#FFEFE5]
+                        hover:text-pet-red
+                    ">
+          Maus-tratos
+        </a>
+
+
+        <a href="#como-denunciar" data-nav="como-denunciar" class="
+                        nav-link
+                        rounded-lg
+                        px-3
+                        py-2
+                        text-[12px]
+                        font-bold
+                        text-gray-700
+                        transition-all
+                        duration-200
+                        hover:bg-[#FFEFE5]
+                        hover:text-pet-red
+                    ">
+          Denúncias
+        </a>
+
+
+        <a href="#adocao" data-nav="adocao" class="
+                        nav-link
+                        rounded-lg
+                        px-3
+                        py-2
+                        text-[12px]
+                        font-bold
+                        text-gray-700
+                        transition-all
+                        duration-200
+                        hover:bg-[#FFEFE5]
+                        hover:text-pet-red
+                    ">
+          Adoção
+        </a>
+
+
+        <a href="#doacoes" data-nav="doacoes" class="
+                        nav-link
+                        rounded-lg
+                        px-3
+                        py-2
+                        text-[12px]
+                        font-bold
+                        text-gray-700
+                        transition-all
+                        duration-200
+                        hover:bg-[#FFEFE5]
+                        hover:text-pet-red
+                    ">
+          Doações
+        </a>
+
+      </nav>
+
+
+      <!-- BOTÕES DO TOPO -->
+
+      <div class="
+                    hidden
+                    items-center
+                    gap-2
+                    lg:flex
+                ">
+
+        <a href="./login.html" class="
+                        rounded-xl
+                        border
+                        border-pet-blue
+                        px-4
+                        py-2.5
+                        text-[11px]
+                        font-black
+                        text-pet-blue
+                        transition-all
+                        duration-200
+                        hover:-translate-y-0.5
+                        hover:bg-blue-50
+                        active:scale-95
+                    ">
+          Entrar
+        </a>
+
+
+        <a href="./cadastro.html" class="
+                        rounded-xl
+                        bg-pet-red
+                        px-4
+                        py-2.5
+                        text-[11px]
+                        font-black
+                        text-white
+                        shadow-sm
+                        transition-all
+                        duration-200
+                        hover:-translate-y-0.5
+                        hover:bg-red-700
+                        hover:shadow-lg
+                        active:scale-95
+                    ">
+          Criar conta
+        </a>
+
+      </div>
+
+
+      <!-- BOTÃO MOBILE -->
+
+      <button id="btn-menu" type="button" class="
+                    flex
+                    h-10
+                    w-10
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-[#FFEFE5]
+                    text-pet-red
+                    transition-all
+                    duration-200
+                    hover:bg-white
+                    active:scale-95
+                    lg:hidden
+                " aria-label="Abrir menu">
+        <i data-lucide="menu" class="h-5 w-5"></i>
+      </button>
+
+    </div>
+
+
+    <!-- MENU MOBILE -->
+
+    <div id="mobile-menu" class="
+                hidden
+                border-t
+                border-gray-100
+                bg-white
+                lg:hidden
+            ">
+
+      <nav class="
+                    mx-auto
+                    max-w-[1200px]
+                    px-5
+                    pb-5
+                    pt-3
+                ">
+
+        <div class="space-y-1">
+
+
+          <a href="#inicio" class="
+                            mobile-link
+                            block
+                            rounded-lg
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            transition-all
+                            duration-200
+                            hover:bg-pet-cream
+                            hover:text-pet-red
+                        ">
+            Início
+          </a>
+
+
+          <a href="#sobre" class="
+                            mobile-link
+                            block
+                            rounded-lg
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            transition-all
+                            duration-200
+                            hover:bg-pet-cream
+                            hover:text-pet-red
+                        ">
+            Sobre
+          </a>
+
+
+          <a href="#denuncia" class="
+                            mobile-link
+                            block
+                            rounded-lg
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            transition-all
+                            duration-200
+                            hover:bg-pet-cream
+                            hover:text-pet-red
+                        ">
+            Maus-tratos
+          </a>
+
+
+          <a href="#como-denunciar" class="
+                            mobile-link
+                            block
+                            rounded-lg
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            transition-all
+                            duration-200
+                            hover:bg-pet-cream
+                            hover:text-pet-red
+                        ">
+            Denúncias
+          </a>
+
+
+          <a href="#adocao" class="
+                            mobile-link
+                            block
+                            rounded-lg
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            transition-all
+                            duration-200
+                            hover:bg-pet-cream
+                            hover:text-pet-red
+                        ">
+            Adoção
+          </a>
+
+
+          <a href="#doacoes" class="
+                            mobile-link
+                            block
+                            rounded-lg
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            transition-all
+                            duration-200
+                            hover:bg-pet-cream
+                            hover:text-pet-red
+                        ">
+            Doações
+          </a>
+
+
+          <div class="
+                            mt-3
+                            grid
+                            grid-cols-2
+                            gap-2
+                            border-t
+                            border-gray-100
+                            pt-4
+                        ">
+
+            <a href="./login.html" class="
+                                rounded-xl
+                                border
+                                border-pet-blue
+                                px-4
+                                py-3
+                                text-center
+                                text-sm
+                                font-bold
+                                text-pet-blue
+                                transition-all
+                                duration-200
+                                hover:bg-blue-50
+                                active:scale-95
+                            ">
+              Entrar
+            </a>
+
+
+            <a href="./cadastro.html" class="
+                                rounded-xl
+                                bg-pet-red
+                                px-4
+                                py-3
+                                text-center
+                                text-sm
+                                font-bold
+                                text-white
+                                transition-all
+                                duration-200
+                                hover:bg-red-700
+                                active:scale-95
+                            ">
+              Criar conta
+            </a>
+
+          </div>
+
+        </div>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+         CONTEÚDO PRINCIPAL
+    ====================================================== -->
+
+  <main>
+
+
+    <!-- =================================================
+             HERO
+        ================================================== -->
+
+    <section id="inicio" class="
+                relative
+                w-full
+                overflow-hidden
+                bg-pet-blue
+            ">
+
+      <!-- IMAGEM ORIGINAL -->
+
+      <img src="../img/Apresentação azul divertida pet shop.png" alt="Todo animal precisa de amor e carinho" class="
+                    block
+                    min-h-[560px]
+                    h-auto
+                    w-full
+                    object-cover
+                    object-center
+                ">
+
+
+      <!-- SOMBRA -->
+
+      <div class="
+                    absolute
+                    inset-0
+                    bg-black/10
+                "></div>
+
+
+      <!-- FRASE SOBRE A IMAGEM -->
+
+      <div class="
+                    absolute
+                    inset-0
+                    flex
+                    items-center
+                    px-6
+                    pt-[76px]
+                    sm:px-10
+                    lg:px-20
+                    xl:px-28
+                ">
+
+        <div class="
+                        max-w-xl
+                        animate-fadeInUp
+                    ">
+
+          <span class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-full
+                            bg-white/90
+                            px-4
+                            py-2
+                            text-xs
+                            font-bold
+                            text-pet-red
+                            shadow-lg
+                            backdrop-blur-sm
+                        ">
+
+            <i data-lucide="paw-print" class="h-4 w-4"></i>
+
+            Central Pet
+
+          </span>
+
+
+          <h1 class="
+                            mt-5
+                            max-w-2xl
+                            text-4xl
+                            font-black
+                            leading-[1.05]
+                            text-white
+                            drop-shadow-[0_3px_12px_rgba(0,0,0,0.45)]
+                            sm:text-5xl
+                            lg:text-6xl
+                        ">
+            Todo animal precisa de amor e carinho.
+          </h1>
+
+
+          <p class="
+                            mt-5
+                            max-w-lg
+                            text-base
+                            leading-relaxed
+                            text-white
+                            drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]
+                            sm:text-lg
+                        ">
+            Informação, orientação e conexão para
+            ajudar na proteção dos animais.
+          </p>
+
+
+          <a href="#sobre" class="
+                            mt-7
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            bg-white
+                            px-6
+                            py-3.5
+                            text-sm
+                            font-black
+                            text-pet-blue
+                            shadow-xl
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:scale-105
+                            active:scale-95
+                        ">
+            Conheça a Central Pet
+
+            <i data-lucide="arrow-down" class="h-4 w-4"></i>
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+             SOBRE
+        ================================================== -->
+
+    <section id="sobre" class="
+                scroll-mt-24
+                bg-pet-cream
+                py-20
+                lg:py-24
+            ">
+
+      <div class="
+                    mx-auto
+                    max-w-[1200px]
+                    px-6
+                    lg:px-8
+                ">
+
+        <div class="max-w-4xl">
+
+          <span class="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-pet-red
+                        ">
+            Sobre a Central Pet
+          </span>
+
+
+          <h2 class="
+                            mt-3
+                            text-3xl
+                            font-black
+                            leading-tight
+                            text-pet-blue
+                            sm:text-4xl
+                        ">
+            Informação também é uma forma de proteção.
+          </h2>
+
+
+          <p class="
+                            mt-6
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            A Central Pet é uma plataforma criada para
+            reunir informações e recursos relacionados à
+            proteção animal em um único espaço.
+          </p>
+
+
+          <p class="
+                            mt-4
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            A proposta é aproximar pessoas e organizações
+            que atuam na proteção dos animais, facilitando
+            o acesso a informações sobre maus-tratos,
+            denúncias, adoção responsável e doações.
+          </p>
+
+
+          <p class="
+                            mt-4
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            A plataforma não substitui os órgãos públicos,
+            serviços de emergência ou canais oficiais de
+            denúncia. Seu papel é ajudar o usuário a
+            compreender cada situação, organizar informações
+            e encontrar a forma adequada de buscar ajuda.
+          </p>
+
+        </div>
+
+
+        <div class="
+                        mt-12
+                        grid
+                        gap-5
+                        md:grid-cols-3
+                    ">
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-red-100
+                                text-pet-red
+                            ">
+              <i data-lucide="shield-check" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                text-lg
+                                font-black
+                                text-pet-blue
+                            ">
+              Proteção
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Informações para reconhecer situações
+              que podem colocar animais em risco.
+            </p>
+
+          </article>
+
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-blue-100
+                                text-pet-blue
+                            ">
+              <i data-lucide="users" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                text-lg
+                                font-black
+                                text-pet-blue
+                            ">
+              Conexão
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Pessoas e organizações podem se conectar
+              para atuar em diferentes situações.
+            </p>
+
+          </article>
+
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-yellow-100
+                                text-yellow-700
+                            ">
+              <i data-lucide="book-open" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                text-lg
+                                font-black
+                                text-pet-blue
+                            ">
+              Informação
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Conteúdos para entender denúncias,
+              adoção, cuidados e doações.
+            </p>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+             MAUS-TRATOS
+        ================================================== -->
+
+    <section id="denuncia" class="
+                scroll-mt-24
+                bg-white
+                py-20
+                lg:py-24
+            ">
+
+      <div class="
+                    mx-auto
+                    max-w-[1200px]
+                    px-6
+                    lg:px-8
+                ">
+
+        <div class="max-w-4xl">
+
+          <span class="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-pet-red
+                        ">
+            Maus-tratos
+          </span>
+
+
+          <h2 class="
+                            mt-3
+                            text-3xl
+                            font-black
+                            leading-tight
+                            text-pet-blue
+                            sm:text-4xl
+                        ">
+            O que pode ser considerado maus-tratos?
+          </h2>
+
+
+          <p class="
+                            mt-6
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            A legislação brasileira considera crime
+            praticar abuso, maus-tratos, ferir ou mutilar
+            animais silvestres, domésticos ou domesticados,
+            nativos ou exóticos.
+          </p>
+
+
+          <p class="
+                            mt-4
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            Maus-tratos não significam apenas agressões
+            físicas. Dependendo das circunstâncias,
+            abandono, negligência, falta de alimentação
+            ou água, condições inadequadas de abrigo e
+            ausência de cuidados necessários podem indicar
+            uma situação que deve ser avaliada pelas
+            autoridades competentes.
+          </p>
+
+
+          <p class="
+                            mt-4
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            Para cães e gatos, a legislação federal prevê
+            tratamento penal específico para as condutas
+            de abuso e maus-tratos.
+          </p>
+
+        </div>
+
+
+        <div class="
+                        mt-12
+                        grid
+                        gap-5
+                        md:grid-cols-2
+                    ">
+
+          <!-- VIOLÊNCIA -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <div class="flex gap-4">
+
+              <div class="
+                                    flex
+                                    h-11
+                                    w-11
+                                    shrink-0
+                                    items-center
+                                    justify-center
+                                    rounded-xl
+                                    bg-white
+                                    text-pet-red
+                                    shadow-sm
+                                ">
+                <i data-lucide="swords" class="h-5 w-5"></i>
+              </div>
+
+
+              <div>
+
+                <h3 class="
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  Violência e agressão
+                </h3>
+
+
+                <p class="
+                                        mt-2
+                                        text-sm
+                                        leading-6
+                                        text-gray-700
+                                    ">
+                  Agressões, ferimentos, mutilações
+                  e outras formas de violência podem
+                  configurar maus-tratos.
+                </p>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- ABANDONO -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <div class="flex gap-4">
+
+              <div class="
+                                    flex
+                                    h-11
+                                    w-11
+                                    shrink-0
+                                    items-center
+                                    justify-center
+                                    rounded-xl
+                                    bg-white
+                                    text-pet-red
+                                    shadow-sm
+                                ">
+                <i data-lucide="house-off" class="h-5 w-5"></i>
+              </div>
+
+
+              <div>
+
+                <h3 class="
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  Abandono
+                </h3>
+
+
+                <p class="
+                                        mt-2
+                                        text-sm
+                                        leading-6
+                                        text-gray-700
+                                    ">
+                  Deixar um animal sem os cuidados
+                  necessários pode expô-lo a
+                  sofrimento e risco.
+                </p>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- NECESSIDADES BÁSICAS -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <div class="flex gap-4">
+
+              <div class="
+                                    flex
+                                    h-11
+                                    w-11
+                                    shrink-0
+                                    items-center
+                                    justify-center
+                                    rounded-xl
+                                    bg-white
+                                    text-pet-red
+                                    shadow-sm
+                                ">
+                <i data-lucide="utensils" class="h-5 w-5"></i>
+              </div>
+
+
+              <div>
+
+                <h3 class="
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  Falta de necessidades básicas
+                </h3>
+
+
+                <p class="
+                                        mt-2
+                                        text-sm
+                                        leading-6
+                                        text-gray-700
+                                    ">
+                  Alimentação, água, higiene e
+                  condições mínimas de cuidado
+                  são necessidades fundamentais.
+                </p>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- SAÚDE -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <div class="flex gap-4">
+
+              <div class="
+                                    flex
+                                    h-11
+                                    w-11
+                                    shrink-0
+                                    items-center
+                                    justify-center
+                                    rounded-xl
+                                    bg-white
+                                    text-pet-red
+                                    shadow-sm
+                                ">
+                <i data-lucide="stethoscope" class="h-5 w-5"></i>
+              </div>
+
+
+              <div>
+
+                <h3 class="
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  Falta de cuidados de saúde
+                </h3>
+
+
+                <p class="
+                                        mt-2
+                                        text-sm
+                                        leading-6
+                                        text-gray-700
+                                    ">
+                  Quando um animal está doente ou
+                  ferido, a ausência de cuidados
+                  necessários pode ser relevante
+                  na avaliação da situação.
+                </p>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </div>
+
+
+        <!-- ALERTA -->
+
+        <div class="
+                        mt-10
+                        rounded-[2rem]
+                        border-l-4
+                        border-pet-red
+                        bg-red-50
+                        p-7
+                    ">
+
+          <div class="flex gap-4">
+
+            <i data-lucide="triangle-alert" class="
+                                mt-1
+                                h-6
+                                w-6
+                                shrink-0
+                                text-pet-red
+                            "></i>
+
+
+            <div>
+
+              <h3 class="
+                                    font-black
+                                    text-pet-blue
+                                ">
+                Não confronte uma situação perigosa
+              </h3>
+
+
+              <p class="
+                                    mt-2
+                                    text-sm
+                                    leading-6
+                                    text-gray-700
+                                ">
+                A pessoa que presencia uma ocorrência
+                deve priorizar sua própria segurança.
+                Evite confrontar o responsável ou
+                tentar realizar sozinho um resgate
+                quando isso puder colocar alguém em risco.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+             COMO DENUNCIAR
+        ================================================== -->
+
+    <section id="como-denunciar" class="
+                scroll-mt-24
+                bg-pet-blue
+                py-20
+                lg:py-24
+            ">
+
+      <div class="
+                    mx-auto
+                    max-w-[1200px]
+                    px-6
+                    lg:px-8
+                ">
+
+        <div class="max-w-4xl">
+
+          <span class="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-pet-orange
+                        ">
+            Como denunciar
+          </span>
+
+
+          <h2 class="
+                            mt-3
+                            text-3xl
+                            font-black
+                            text-white
+                            sm:text-4xl
+                        ">
+            O que informar em uma denúncia?
+          </h2>
+
+
+          <p class="
+                            mt-5
+                            text-base
+                            leading-8
+                            text-white/75
+                        ">
+            Uma denúncia objetiva e bem documentada
+            pode facilitar a compreensão dos fatos.
+            Sempre que possível, reúna informações que
+            permitam identificar o local, o animal,
+            a situação observada e os envolvidos.
+          </p>
+
+        </div>
+
+
+        <div class="
+                        mt-12
+                        grid
+                        gap-5
+                        md:grid-cols-2
+                        lg:grid-cols-3
+                    ">
+
+          <!-- LOCAL -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-blue-100
+                                text-pet-blue
+                            ">
+              <i data-lucide="map-pin" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Local
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Informe endereço, ponto de referência
+              ou outras informações que ajudem a
+              localizar o animal.
+            </p>
+
+          </article>
+
+
+          <!-- DATA -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-blue-100
+                                text-pet-blue
+                            ">
+              <i data-lucide="calendar-days" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Data e horário
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Registre quando os fatos ocorreram,
+              quando possível.
+            </p>
+
+          </article>
+
+
+          <!-- DESCRIÇÃO -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-blue-100
+                                text-pet-blue
+                            ">
+              <i data-lucide="file-text" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Descrição
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Explique o que aconteceu de maneira
+              objetiva, relatando aquilo que você
+              realmente observou.
+            </p>
+
+          </article>
+
+
+          <!-- EVIDÊNCIAS -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-blue-100
+                                text-pet-blue
+                            ">
+              <i data-lucide="camera" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Evidências
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Quando for seguro e apropriado,
+              fotos, vídeos, documentos, mapas
+              e registros veterinários podem ajudar.
+            </p>
+
+          </article>
+
+
+          <!-- TESTEMUNHAS -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-blue-100
+                                text-pet-blue
+                            ">
+              <i data-lucide="users" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Testemunhas
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Quando existirem, dados de testemunhas
+              podem complementar o relato.
+            </p>
+
+          </article>
+
+
+          <!-- RESPONSÁVEL -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                        ">
+
+            <div class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-2xl
+                                bg-blue-100
+                                text-pet-blue
+                            ">
+              <i data-lucide="user-round-search" class="h-6 w-6"></i>
+            </div>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Responsável
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Caso seja conhecido e seguro informar,
+              registre dados que possam ajudar a
+              identificar o responsável.
+            </p>
+
+          </article>
+
+        </div>
+
+
+        <!-- A QUEM CONTATAR -->
+
+        <div class="
+                        mt-12
+                        rounded-[2rem]
+                        bg-white
+                        p-8
+                        lg:p-10
+                    ">
+
+          <span class="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-pet-red
+                        ">
+            A quem contatar
+          </span>
+
+
+          <h3 class="
+                            mt-3
+                            text-2xl
+                            font-black
+                            text-pet-blue
+                            sm:text-3xl
+                        ">
+            Procure o canal adequado para cada situação.
+          </h3>
+
+
+          <p class="
+                            mt-4
+                            max-w-4xl
+                            leading-7
+                            text-gray-600
+                        ">
+            Os canais disponíveis podem variar de acordo
+            com o estado, município e natureza da ocorrência.
+            Entre as possibilidades estão autoridades
+            policiais, Ministério Público, órgãos ambientais
+            e serviços públicos ou especializados da região.
+          </p>
+
+
+          <div class="
+                            mt-8
+                            grid
+                            gap-5
+                            lg:grid-cols-3
+                        ">
+
+            <!-- POLÍCIA -->
+
+            <div class="
+                                rounded-2xl
+                                bg-pet-cream
+                                p-6
+                            ">
+
+              <i data-lucide="shield" class="
+                                    h-7
+                                    w-7
+                                    text-pet-red
+                                "></i>
+
+
+              <h4 class="
+                                    mt-4
+                                    font-black
+                                    text-pet-blue
+                                ">
+                Autoridade policial
+              </h4>
+
+
+              <p class="
+                                    mt-2
+                                    text-sm
+                                    leading-6
+                                    text-gray-700
+                                ">
+                Casos de maus-tratos podem ser
+                comunicados à polícia, especialmente
+                quando houver risco ou ocorrência
+                de natureza criminal.
+              </p>
+
+            </div>
+
+
+            <!-- MINISTÉRIO PÚBLICO -->
+
+            <div class="
+                                rounded-2xl
+                                bg-pet-cream
+                                p-6
+                            ">
+
+              <i data-lucide="scale" class="
+                                    h-7
+                                    w-7
+                                    text-pet-red
+                                "></i>
+
+
+              <h4 class="
+                                    mt-4
+                                    font-black
+                                    text-pet-blue
+                                ">
+                Ministério Público
+              </h4>
+
+
+              <p class="
+                                    mt-2
+                                    text-sm
+                                    leading-6
+                                    text-gray-700
+                                ">
+                O Ministério Público possui canais
+                próprios para receber notícias de
+                fatos e denúncias, conforme sua
+                estrutura local.
+              </p>
+
+            </div>
+
+
+            <!-- ÓRGÃO AMBIENTAL -->
+
+            <div class="
+                                rounded-2xl
+                                bg-pet-cream
+                                p-6
+                            ">
+
+              <i data-lucide="leaf" class="
+                                    h-7
+                                    w-7
+                                    text-pet-red
+                                "></i>
+
+
+              <h4 class="
+                                    mt-4
+                                    font-black
+                                    text-pet-blue
+                                ">
+                Órgão ambiental
+              </h4>
+
+
+              <p class="
+                                    mt-2
+                                    text-sm
+                                    leading-6
+                                    text-gray-700
+                                ">
+                Situações envolvendo fauna silvestre
+                ou exótica podem envolver órgãos
+                ambientais competentes, conforme
+                o caso.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="
+                            mt-7
+                            rounded-2xl
+                            bg-blue-50
+                            p-5
+                        ">
+
+            <div class="flex gap-4">
+
+              <i data-lucide="info" class="
+                                    mt-0.5
+                                    h-5
+                                    w-5
+                                    shrink-0
+                                    text-pet-blue
+                                "></i>
+
+
+              <p class="
+                                    text-sm
+                                    leading-6
+                                    text-gray-700
+                                ">
+                Em uma emergência ou situação de
+                perigo imediato, utilize primeiro
+                o serviço público de emergência
+                ou a autoridade competente. A
+                Central Pet não substitui esses
+                serviços.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="mt-10 text-center">
+
+          <a href="./centralpet.html#/denunciar" class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            bg-pet-red
+                            px-6
+                            py-3
+                            text-sm
+                            font-bold
+                            text-white
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:bg-red-700
+                            hover:shadow-lg
+                            active:scale-95
+                        ">
+            Registrar uma denúncia na Central Pet
+
+            <i data-lucide="arrow-right" class="h-4 w-4"></i>
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+             ADOÇÃO
+        ================================================== -->
+
+    <section id="adocao" class="
+                scroll-mt-24
+                bg-pet-cream
+                py-20
+                lg:py-24
+            ">
+
+      <div class="
+                    mx-auto
+                    max-w-[1200px]
+                    px-6
+                    lg:px-8
+                ">
+
+        <div class="max-w-4xl">
+
+          <span class="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-pet-red
+                        ">
+            Adoção responsável
+          </span>
+
+
+          <h2 class="
+                            mt-3
+                            text-3xl
+                            font-black
+                            leading-tight
+                            text-pet-blue
+                            sm:text-4xl
+                        ">
+            Adotar é assumir um compromisso.
+          </h2>
+
+
+          <p class="
+                            mt-6
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            A adoção deve ser uma decisão consciente.
+            Antes de receber um animal, é importante
+            considerar as condições da residência,
+            disponibilidade de tempo, recursos financeiros,
+            rotina da família e capacidade de oferecer
+            cuidados permanentes.
+          </p>
+
+
+          <p class="
+                            mt-4
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            O tutor também deve considerar alimentação,
+            higiene, vacinação, atendimento veterinário,
+            prevenção de doenças, segurança e outras
+            necessidades próprias do animal.
+          </p>
+
+        </div>
+
+
+        <div class="
+                        mt-12
+                        grid
+                        gap-5
+                        md:grid-cols-2
+                        lg:grid-cols-4
+                    ">
+
+          <!-- AMBIENTE -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="house" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Ambiente seguro
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              O espaço deve ser adequado ao porte,
+              comportamento e necessidades do animal.
+            </p>
+
+          </article>
+
+
+          <!-- ALIMENTAÇÃO -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="utensils" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Alimentação
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              É responsabilidade do tutor garantir
+              alimento e água adequados.
+            </p>
+
+          </article>
+
+
+          <!-- SAÚDE -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="stethoscope" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Saúde
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Acompanhamento veterinário e prevenção
+              fazem parte da guarda responsável.
+            </p>
+
+          </article>
+
+
+          <!-- COMPROMISSO -->
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="calendar-heart" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Compromisso
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              A decisão precisa considerar o longo
+              prazo e as responsabilidades da tutela.
+            </p>
+
+          </article>
+
+        </div>
+
+
+        <!-- COMO FUNCIONA -->
+
+        <div class="
+                        mt-10
+                        rounded-[2rem]
+                        bg-pet-blue
+                        p-8
+                        lg:p-10
+                    ">
+
+          <div class="
+                            grid
+                            gap-8
+                            lg:grid-cols-2
+                        ">
+
+            <div>
+
+              <h3 class="
+                                    text-2xl
+                                    font-black
+                                    text-white
+                                ">
+                Como funciona a adoção na Central Pet?
+              </h3>
+
+
+              <p class="
+                                    mt-4
+                                    leading-7
+                                    text-white/75
+                                ">
+                O usuário pode consultar os animais
+                cadastrados, verificar as informações
+                disponíveis e demonstrar interesse
+                naquele que deseja conhecer melhor.
+              </p>
+
+
+              <p class="
+                                    mt-4
+                                    leading-7
+                                    text-white/75
+                                ">
+                A organização ou responsável pelo animal
+                pode entrar em contato para conversar
+                sobre a adoção e orientar sobre as
+                próximas etapas.
+              </p>
+
+            </div>
+
+
+            <div class="space-y-4">
+
+              <div class="
+                                    flex
+                                    items-center
+                                    gap-4
+                                    rounded-2xl
+                                    bg-white/10
+                                    p-4
+                                ">
+
+                <span class="
+                                        flex
+                                        h-9
+                                        w-9
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-white
+                                        text-sm
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  1
+                </span>
+
+                <span class="
+                                        text-sm
+                                        font-bold
+                                        text-white
+                                    ">
+                  Conheça o animal
+                </span>
+
+              </div>
+
+
+              <div class="
+                                    flex
+                                    items-center
+                                    gap-4
+                                    rounded-2xl
+                                    bg-white/10
+                                    p-4
+                                ">
+
+                <span class="
+                                        flex
+                                        h-9
+                                        w-9
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-white
+                                        text-sm
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  2
+                </span>
+
+                <span class="
+                                        text-sm
+                                        font-bold
+                                        text-white
+                                    ">
+                  Demonstre interesse
+                </span>
+
+              </div>
+
+
+              <div class="
+                                    flex
+                                    items-center
+                                    gap-4
+                                    rounded-2xl
+                                    bg-white/10
+                                    p-4
+                                ">
+
+                <span class="
+                                        flex
+                                        h-9
+                                        w-9
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-white
+                                        text-sm
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  3
+                </span>
+
+                <span class="
+                                        text-sm
+                                        font-bold
+                                        text-white
+                                    ">
+                  Converse com o responsável
+                </span>
+
+              </div>
+
+
+              <div class="
+                                    flex
+                                    items-center
+                                    gap-4
+                                    rounded-2xl
+                                    bg-white/10
+                                    p-4
+                                ">
+
+                <span class="
+                                        flex
+                                        h-9
+                                        w-9
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-white
+                                        text-sm
+                                        font-black
+                                        text-pet-blue
+                                    ">
+                  4
+                </span>
+
+                <span class="
+                                        text-sm
+                                        font-bold
+                                        text-white
+                                    ">
+                  Avalie a adoção com responsabilidade
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="mt-8">
+
+            <a href="./centralpet.html#/adotar" class="
+                                inline-flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                bg-white
+                                px-6
+                                py-3
+                                text-sm
+                                font-black
+                                text-pet-blue
+                                transition-all
+                                duration-300
+                                hover:-translate-y-1
+                                hover:scale-105
+                                active:scale-95
+                            ">
+              Ver animais disponíveis
+
+              <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+             DOAÇÕES
+        ================================================== -->
+
+    <section id="doacoes" class="
+                scroll-mt-24
+                bg-white
+                py-20
+                lg:py-24
+            ">
+
+      <div class="
+                    mx-auto
+                    max-w-[1200px]
+                    px-6
+                    lg:px-8
+                ">
+
+        <div class="max-w-4xl">
+
+          <span class="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-pet-red
+                        ">
+            Doações
+          </span>
+
+
+          <h2 class="
+                            mt-3
+                            text-3xl
+                            font-black
+                            text-pet-blue
+                            sm:text-4xl
+                        ">
+            Como funcionam as doações?
+          </h2>
+
+
+          <p class="
+                            mt-6
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            Organizações de proteção animal podem precisar
+            de recursos para diferentes necessidades.
+            Dependendo da campanha, a contribuição pode
+            ser direcionada para alimentação, saúde,
+            resgates, manutenção de abrigos e outros
+            cuidados.
+          </p>
+
+
+          <p class="
+                            mt-4
+                            text-base
+                            leading-8
+                            text-gray-700
+                        ">
+            Antes de realizar uma contribuição, é importante
+            conferir quem está recebendo a doação, qual é
+            a finalidade apresentada e quais informações
+            sobre a utilização dos recursos são fornecidas.
+          </p>
+
+        </div>
+
+
+        <div class="
+                        mt-12
+                        grid
+                        gap-5
+                        md:grid-cols-2
+                        lg:grid-cols-4
+                    ">
+
+          <!-- ALIMENTAÇÃO -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="utensils" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Alimentação
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Contribuições podem ajudar nas despesas
+              relacionadas à alimentação dos animais.
+            </p>
+
+          </article>
+
+
+          <!-- SAÚDE -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="heart-pulse" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Saúde
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Recursos podem ser destinados a consultas,
+              exames, medicamentos e tratamentos.
+            </p>
+
+          </article>
+
+
+          <!-- RESGATE -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="ambulance" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Resgates
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Podem contribuir para despesas relacionadas
+              ao resgate e acolhimento de animais.
+            </p>
+
+          </article>
+
+
+          <!-- ABRIGO -->
+
+          <article class="
+                            rounded-3xl
+                            bg-pet-cream
+                            p-7
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <i data-lucide="house-heart" class="
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Abrigos
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Podem ajudar com despesas de manutenção
+              e cuidados dos animais acolhidos.
+            </p>
+
+          </article>
+
+        </div>
+
+
+        <!-- MODALIDADES -->
+
+        <div class="
+                        mt-10
+                        rounded-[2rem]
+                        bg-pet-yellow
+                        p-8
+                        lg:p-10
+                    ">
+
+          <div class="
+                            grid
+                            gap-8
+                            lg:grid-cols-2
+                        ">
+
+            <div>
+
+              <h3 class="
+                                    text-2xl
+                                    font-black
+                                    text-pet-blue
+                                ">
+                Doação única ou mensal
+              </h3>
+
+
+              <p class="
+                                    mt-4
+                                    leading-7
+                                    text-gray-700
+                                ">
+                A plataforma pode oferecer modalidades
+                de contribuição única ou recorrente.
+                O usuário escolhe o valor disponível
+                e a finalidade apresentada pela
+                campanha.
+              </p>
+
+
+              <p class="
+                                    mt-4
+                                    leading-7
+                                    text-gray-700
+                                ">
+                Uma contribuição recorrente pode ajudar
+                uma organização a contar com recursos
+                de maneira mais previsível, enquanto
+                uma contribuição única permite apoiar
+                uma necessidade específica.
+              </p>
+
+            </div>
+
+
+            <div>
+
+              <h3 class="
+                                    text-2xl
+                                    font-black
+                                    text-pet-blue
+                                ">
+                Transparência
+              </h3>
+
+
+              <p class="
+                                    mt-4
+                                    leading-7
+                                    text-gray-700
+                                ">
+                As informações apresentadas sobre uma
+                campanha devem deixar claro, sempre
+                que possível, qual é sua finalidade
+                e quem é o responsável pelo recebimento.
+              </p>
+
+
+              <p class="
+                                    mt-4
+                                    leading-7
+                                    text-gray-700
+                                ">
+                A prestação de contas dos recursos
+                recebidos é responsabilidade da
+                organização que administra a doação.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="mt-8">
+
+            <a href="./centralpet.html#/doar" class="
+                                inline-flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                bg-pet-blue
+                                px-6
+                                py-3
+                                text-sm
+                                font-bold
+                                text-white
+                                transition-all
+                                duration-300
+                                hover:-translate-y-1
+                                hover:shadow-lg
+                                active:scale-95
+                            ">
+              Conhecer as opções de doação
+
+              <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+             COMO A CENTRAL PET FUNCIONA
+        ================================================== -->
+
+    <section id="como-funciona" class="
+                scroll-mt-24
+                bg-pet-cream
+                py-20
+                lg:py-24
+            ">
+
+      <div class="
+                    mx-auto
+                    max-w-[1200px]
+                    px-6
+                    lg:px-8
+                ">
+
+        <div class="
+                        mx-auto
+                        max-w-3xl
+                        text-center
+                    ">
+
+          <span class="
+                            text-sm
+                            font-black
+                            uppercase
+                            tracking-[0.18em]
+                            text-pet-red
+                        ">
+            Como funciona
+          </span>
+
+
+          <h2 class="
+                            mt-3
+                            text-3xl
+                            font-black
+                            text-pet-blue
+                            sm:text-4xl
+                        ">
+            Um espaço para informar, conectar e ajudar.
+          </h2>
+
+
+          <p class="
+                            mt-5
+                            leading-7
+                            text-gray-600
+                        ">
+            Cada recurso possui uma finalidade dentro da
+            plataforma.
+          </p>
+
+        </div>
+
+
+        <div class="
+                        mt-12
+                        grid
+                        gap-6
+                        md:grid-cols-2
+                        lg:grid-cols-4
+                    ">
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <span class="
+                                text-4xl
+                                font-black
+                                text-pet-orange
+                            ">
+              01
+            </span>
+
+
+            <i data-lucide="book-open" class="
+                                mt-5
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Informar
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              O visitante encontra informações
+              sobre proteção animal, denúncias,
+              adoção e doações.
+            </p>
+
+          </article>
+
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <span class="
+                                text-4xl
+                                font-black
+                                text-pet-orange
+                            ">
+              02
+            </span>
+
+
+            <i data-lucide="file-warning" class="
+                                mt-5
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Registrar
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              Usuários cadastrados podem registrar
+              ocorrências e acompanhar suas denúncias.
+            </p>
+
+          </article>
+
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <span class="
+                                text-4xl
+                                font-black
+                                text-pet-orange
+                            ">
+              03
+            </span>
+
+
+            <i data-lucide="message-circle" class="
+                                mt-5
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Conectar
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              A plataforma possibilita comunicação
+              entre usuários e organizações.
+            </p>
+
+          </article>
+
+
+          <article class="
+                            rounded-3xl
+                            bg-white
+                            p-7
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:shadow-lg
+                        ">
+
+            <span class="
+                                text-4xl
+                                font-black
+                                text-pet-orange
+                            ">
+              04
+            </span>
+
+
+            <i data-lucide="heart" class="
+                                mt-5
+                                h-8
+                                w-8
+                                text-pet-red
+                            "></i>
+
+
+            <h3 class="
+                                mt-5
+                                font-black
+                                text-pet-blue
+                            ">
+              Participar
+            </h3>
+
+
+            <p class="
+                                mt-2
+                                text-sm
+                                leading-6
+                                text-gray-600
+                            ">
+              A participação pode acontecer pela
+              adoção, denúncia ou contribuição.
+            </p>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+             CTA FINAL
+        ================================================== -->
+
+    <section class="
+                bg-pet-orange
+                py-20
+            ">
+
+      <div class="
+                    mx-auto
+                    max-w-[900px]
+                    px-6
+                    text-center
+                    lg:px-8
+                ">
+
+        <i data-lucide="paw-print" class="
+                        mx-auto
+                        h-12
+                        w-12
+                        text-pet-blue
+                    "></i>
+
+
+        <h2 class="
+                        mt-6
+                        text-3xl
+                        font-black
+                        text-pet-blue
+                        sm:text-4xl
+                    ">
+          Quer participar da Central Pet?
+        </h2>
+
+
+        <p class="
+                        mx-auto
+                        mt-4
+                        max-w-2xl
+                        leading-7
+                        text-gray-800
+                    ">
+          Depois de conhecer as informações da plataforma,
+          você pode criar sua conta para utilizar os
+          recursos disponíveis.
+        </p>
+
+
+        <div class="
+                        mt-7
+                        flex
+                        flex-wrap
+                        justify-center
+                        gap-3
+                    ">
+
+          <a href="./cadastro.html" class="
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            bg-pet-red
+                            px-6
+                            py-3.5
+                            text-sm
+                            font-black
+                            text-white
+                            shadow-lg
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            hover:scale-105
+                            hover:bg-red-700
+                            active:scale-95
+                        ">
+            Criar minha conta
+
+            <i data-lucide="user-plus" class="h-4 w-4"></i>
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+  <footer class="
+            bg-pet-blue
+            text-white
+        ">
+
+    <div class="
+                mx-auto
+                max-w-[1200px]
+                px-6
+                py-12
+                lg:px-8
+            ">
+
+      <div class="
+                    grid
+                    gap-10
+                    md:grid-cols-3
+                ">
+
+        <!-- MARCA -->
+
+        <div>
+
+          <div class="
+                            flex
+                            items-center
+                            gap-3
+                        ">
+
+            <img src="../img/logo-centralpet.png" alt="Central Pet" class="
+                                h-12
+                                w-12
+                                object-contain
+                            ">
+
+            <div>
+
+              <strong class="
+                                    block
+                                    text-lg
+                                    font-black
+                                ">
+                Central Pet
+              </strong>
+
+              <span class="
+                                    text-xs
+                                    text-white/70
+                                ">
+                Informação e proteção animal
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <p class="
+                            mt-5
+                            max-w-sm
+                            text-sm
+                            leading-6
+                            text-white/70
+                        ">
+            Informação, orientação e conexão para
+            promover a proteção e o cuidado animal.
+          </p>
+
+        </div>
+
+
+        <!-- NAVEGAÇÃO -->
+
+        <div>
+
+          <h3 class="font-black">
+            Navegação
+          </h3>
+
+
+          <div class="
+                            mt-4
+                            space-y-2
+                        ">
+
+            <a href="#inicio" class="
+                                block
+                                text-sm
+                                text-white/70
+                                transition-colors
+                                duration-200
+                                hover:text-white
+                            ">
+              Início
+            </a>
+
+
+            <a href="#sobre" class="
+                                block
+                                text-sm
+                                text-white/70
+                                transition-colors
+                                duration-200
+                                hover:text-white
+                            ">
+              Sobre
+            </a>
+
+
+            <a href="#denuncia" class="
+                                block
+                                text-sm
+                                text-white/70
+                                transition-colors
+                                duration-200
+                                hover:text-white
+                            ">
+              Maus-tratos
+            </a>
+
+
+            <a href="#como-denunciar" class="
+                                block
+                                text-sm
+                                text-white/70
+                                transition-colors
+                                duration-200
+                                hover:text-white
+                            ">
+              Denúncias
+            </a>
+
+
+            <a href="#adocao" class="
+                                block
+                                text-sm
+                                text-white/70
+                                transition-colors
+                                duration-200
+                                hover:text-white
+                            ">
+              Adoção
+            </a>
+
+
+            <a href="#doacoes" class="
+                                block
+                                text-sm
+                                text-white/70
+                                transition-colors
+                                duration-200
+                                hover:text-white
+                            ">
+              Doações
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- ACESSO -->
+
+        <div>
+
+          <h3 class="font-black">
+            Central Pet
+          </h3>
+
+
+          <p class="
+                            mt-4
+                            text-sm
+                            leading-6
+                            text-white/70
+                        ">
+            Acesse sua conta para utilizar os recursos
+            da plataforma.
+          </p>
+
+
+          <a href="./login.html" class="
+                            mt-5
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-xl
+                            bg-white
+                            px-5
+                            py-3
+                            text-sm
+                            font-black
+                            text-pet-blue
+                            transition-all
+                            duration-300
+                            hover:-translate-y-1
+                            active:scale-95
+                        ">
+            Entrar
+
+            <i data-lucide="log-in" class="h-4 w-4"></i>
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="
+                    mt-10
+                    border-t
+                    border-white/10
+                    pt-6
+                    text-center
+                ">
+
+        <p class="
+                        text-xs
+                        text-white/50
+                    ">
+          © 2026 Central Pet. Projeto acadêmico.
+        </p>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+  <script src="../js/inicio.js"></script>
+
+</body>
+
+</html>

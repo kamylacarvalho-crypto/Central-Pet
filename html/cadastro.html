@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Central Pet - Crie sua conta.">
+
+  <title>Central Pet - Cadastre-se</title>
+
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+
+  <script>
+
+    tailwind.config = {
+
+      theme: {
+
+        extend: {
+
+          colors: {
+
+            pet: {
+              orange: '#FFA56D',
+              red: '#E00808',
+              blue: '#0600A9',
+              cream: '#FFEFE5',
+              beige: '#E4B99E',
+              yellow: '#EEEE82'
+            }
+
+          },
+
+          fontFamily: {
+
+            sans: [
+              'Roboto',
+              'sans-serif'
+            ],
+
+            serif: [
+              'Abhaya Libre',
+              'serif'
+            ]
+
+          },
+
+          keyframes: {
+
+            fadeIn: {
+
+              '0%': {
+                opacity: '0'
+              },
+
+              '100%': {
+                opacity: '1'
+              }
+
+            },
+
+            fadeInDown: {
+
+              '0%': {
+                opacity: '0',
+                transform:
+                  'translate(-50%, -10px)'
+              },
+
+              '100%': {
+                opacity: '1',
+                transform:
+                  'translate(-50%, 0)'
+              }
+
+            },
+
+            fadeInUp: {
+
+              '0%': {
+                opacity: '0',
+                transform:
+                  'translateY(15px)'
+              },
+
+              '100%': {
+                opacity: '1',
+                transform:
+                  'translateY(0)'
+              }
+
+            },
+
+            shake: {
+
+              '0%, 100%': {
+                transform:
+                  'translateX(0)'
+              },
+
+              '20%, 60%': {
+                transform:
+                  'translateX(-6px)'
+              },
+
+              '40%, 80%': {
+                transform:
+                  'translateX(6px)'
+              }
+
+            }
+
+          },
+
+          animation: {
+
+            fadeIn:
+              'fadeIn .5s ease-out',
+
+            fadeInDown:
+              'fadeInDown .25s ease-out',
+
+            fadeInUp:
+              'fadeInUp .6s ease-out',
+
+            shake:
+              'shake .4s ease-in-out'
+
+          }
+
+        }
+
+      }
+
+    };
+
+  </script>
+
+
+  <!-- =====================================================
+         FONTES
+    ====================================================== -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@700;800&family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+</head>
+
+
+<body class="
+        min-h-screen
+        flex
+        flex-col
+        bg-pet-cream
+        font-sans
+        text-black
+    ">
+
+
+  <!-- =====================================================
+         CABEÇALHO
+    ====================================================== -->
+
+  <header class="
+            w-full
+            h-[70px]
+            shrink-0
+            bg-pet-orange
+            px-5
+            sm:px-[30px]
+            flex
+            items-center
+        ">
+
+    <div class="flex items-center">
+
+      <a href="inicio.html" class="
+                    flex
+                    items-center
+                    gap-2.5
+                    transition-transform
+                    duration-200
+                    hover:scale-[1.02]
+                ">
+
+        <img src="../img/logo-centralpet.png" alt="Logo Central Pet" width="40" height="40" class="
+                        w-10
+                        h-10
+                        object-contain
+                        max-w-[40px]
+                        max-h-[40px]
+                    ">
+
+        <span class="
+                        font-serif
+                        text-3xl
+                        sm:text-[32px]
+                        font-extrabold
+                        text-black
+                    ">
+          Central
+          <span class="text-pet-red">
+            Pet
+          </span>
+        </span>
+
+      </a>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+         ÁREA PRINCIPAL
+    ====================================================== -->
+
+  <main class="
+            flex-1
+            w-full
+            flex
+            items-center
+            justify-center
+            px-5
+            py-10
+            bg-pet-cream
+            bg-[url('../img/fundo-patinhas.png')]
+            bg-repeat
+            bg-top
+            bg-[length:320px]
+        ">
+
+
+    <!-- =================================================
+             CARD DE CADASTRO
+        ================================================== -->
+
+    <section id="cardCadastro" class="
+                relative
+                z-10
+                w-full
+                max-w-[400px]
+                rounded-lg
+                border
+                border-gray-200
+                bg-white
+                p-[30px]
+                shadow-xl
+                animate-fadeInUp
+                transition-all
+                duration-300
+                hover:shadow-2xl
+            ">
+
+      <!-- TÍTULO -->
+
+      <h1 class="
+                    mb-7
+                    text-center
+                    text-4xl
+                    font-extrabold
+                    leading-none
+                    text-black
+                    sm:text-[48px]
+                ">
+        Cadastro
+      </h1>
+
+
+      <form id="formCadastro" action="cadastro.php" method="POST" class="w-full">
+
+        <div class="
+                        mb-[17px]
+                        relative
+                    ">
+
+          <label for="user-email" class="
+                            mb-1.5
+                            block
+                            text-xs
+                            font-medium
+                            text-[#333333]
+                        ">
+            E-mail:
+          </label>
+
+
+          <input type="email" id="user-email" name="email" autocomplete="email" maxlength="254"
+            placeholder="Insira seu e-mail" required class="
+                            h-10
+                            w-full
+                            rounded-md
+                            border
+                            border-[#D8D8D8]
+                            bg-white
+                            px-3
+                            text-sm
+                            text-black
+                            outline-none
+                            placeholder-[#999999]
+                            transition-all
+                            duration-200
+                            hover:border-[#BDBDBD]
+                            focus:border-pet-blue
+                            focus:ring-2
+                            focus:ring-pet-blue/10
+                        ">
+
+        </div>
+      
+
+
+        <!-- =================================================
+                     TIPO DE CONTA
+                ================================================== -->
+
+        <div class="
+                        mb-[17px]
+                        relative
+                    ">
+
+          <span class="
+                            mb-1.5
+                            block
+                            text-xs
+                            font-medium
+                            text-[#333333]
+                        ">
+            Deseja cadastrar como...?
+          </span>
+<div class="flex gap-2">
+
+  <!-- USUÁRIO -->
+  <label class="flex flex-1 cursor-pointer select-none items-center gap-2 rounded-md border border-[#D8D8D8] bg-white p-2.5 text-xs text-[#333333] transition-all duration-200 hover:border-pet-blue hover:bg-[#F8F9FF]">
+    <input type="radio" name="tipo_conta" value="usuario" checked class="h-4 w-4 cursor-pointer accent-pet-red">
+    <span>Usuário comum</span>
+  </label>
+
+  <!-- ÓRGÃO / ONG -->
+  <label class="flex flex-1 cursor-pointer select-none items-center gap-2 rounded-md border border-[#D8D8D8] bg-white p-2.5 text-xs text-[#333333] transition-all duration-200 hover:border-pet-blue hover:bg-[#F8F9FF]">
+    <input type="radio" name="tipo_conta" value="orgao_legal" class="h-4 w-4 cursor-pointer accent-pet-red">
+    <span>ONG</span>
+  </label>
+
+  <!-- ADMINISTRADOR -->
+  <label class="flex flex-1 cursor-pointer select-none items-center gap-2 rounded-md border border-[#D8D8D8] bg-white p-2.5 text-xs text-[#333333] transition-all duration-200 hover:border-pet-blue hover:bg-[#F8F9FF]">
+    <input type="radio" name="tipo_conta" value="admin" class="h-4 w-4 cursor-pointer accent-pet-red">
+    <span>Administrador</span>
+  </label>
+
+</div>
+
+        <!-- =================================================
+                     DATA DE NASCIMENTO
+                ================================================== -->
+
+        <div class="
+                        mb-[17px]
+                        relative
+                    ">
+
+          <label class="
+                            mb-1.5
+                            block
+                            text-xs
+                            font-medium
+                            text-[#333333]
+                        ">
+            Data de nascimento:
+          </label>
+
+
+          <div class="
+                            grid
+                            w-full
+                            grid-cols-3
+                            gap-2
+                        ">
+
+            <input type="text" inputmode="numeric" id="nascimento-dia" name="nascimento_dia" placeholder="DD"
+              maxlength="2" required class="
+                                h-10
+                                w-full
+                                rounded-md
+                                border
+                                border-[#D8D8D8]
+                                bg-white
+                                px-1
+                                text-center
+                                text-sm
+                                text-black
+                                outline-none
+                                placeholder-[#999999]
+                                transition-all
+                                duration-200
+                                focus:border-pet-blue
+                                focus:ring-2
+                                focus:ring-pet-blue/10
+                            ">
+
+
+            <input type="text" inputmode="numeric" id="nascimento-mes" name="nascimento_mes" placeholder="MM"
+              maxlength="2" required class="
+                                h-10
+                                w-full
+                                rounded-md
+                                border
+                                border-[#D8D8D8]
+                                bg-white
+                                px-1
+                                text-center
+                                text-sm
+                                text-black
+                                outline-none
+                                placeholder-[#999999]
+                                transition-all
+                                duration-200
+                                focus:border-pet-blue
+                                focus:ring-2
+                                focus:ring-pet-blue/10
+                            ">
+
+
+            <input type="text" inputmode="numeric" id="nascimento-ano" name="nascimento_ano" placeholder="YYYY"
+              maxlength="4" required class="
+                                h-10
+                                w-full
+                                rounded-md
+                                border
+                                border-[#D8D8D8]
+                                bg-white
+                                px-1
+                                text-center
+                                text-sm
+                                text-black
+                                outline-none
+                                placeholder-[#999999]
+                                transition-all
+                                duration-200
+                                focus:border-pet-blue
+                                focus:ring-2
+                                focus:ring-pet-blue/10
+                            ">
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+                     SENHA
+                ================================================== -->
+
+        <div class="
+                        mb-[17px]
+                        relative
+                    ">
+
+          <label for="senha" class="
+                            mb-1.5
+                            block
+                            text-xs
+                            font-medium
+                            text-[#333333]
+                        ">
+            Crie uma senha:
+          </label>
+
+
+          <input type="password" id="senha" name="senha" autocomplete="new-password" minlength="6" maxlength="12"
+            placeholder="6 a 12 caracteres" required class="
+                            h-10
+                            w-full
+                            rounded-md
+                            border
+                            border-[#D8D8D8]
+                            bg-white
+                            px-3
+                            pr-10
+                            text-sm
+                            text-black
+                            outline-none
+                            placeholder-[#999999]
+                            transition-all
+                            duration-200
+                            hover:border-[#BDBDBD]
+                            focus:border-pet-blue
+                            focus:ring-2
+                            focus:ring-pet-blue/10
+                        ">
+
+
+          <!-- INDICADOR DE FORÇA -->
+
+          <div id="forcaSenha" class="mt-2 hidden">
+
+            <div class="
+                                h-1
+                                w-full
+                                overflow-hidden
+                                rounded-full
+                                bg-gray-200
+                            ">
+
+              <div id="barraForcaSenha" class="
+                                    h-full
+                                    w-0
+                                    rounded-full
+                                    transition-all
+                                    duration-300
+                                "></div>
+
+            </div>
+
+
+            <p id="textoForcaSenha" class="
+                                mt-1
+                                text-right
+                                text-[11px]
+                                text-gray-500
+                            "></p>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+                     CONFIRMAR SENHA
+                ================================================== -->
+
+        <div class="
+                        mb-[15px]
+                        relative
+                    ">
+
+          <label for="confirmarSenha" class="
+                            mb-1.5
+                            block
+                            text-xs
+                            font-medium
+                            text-[#333333]
+                        ">
+            Confirme sua senha:
+          </label>
+
+
+          <input type="password" id="confirmarSenha" name="confirmarSenha" autocomplete="new-password" minlength="6"
+            maxlength="12" placeholder="Insira sua senha" required class="
+                            h-10
+                            w-full
+                            rounded-md
+                            border
+                            border-[#D8D8D8]
+                            bg-white
+                            px-3
+                            pr-10
+                            text-sm
+                            text-black
+                            outline-none
+                            placeholder-[#999999]
+                            transition-all
+                            duration-200
+                            hover:border-[#BDBDBD]
+                            focus:border-pet-blue
+                            focus:ring-2
+                            focus:ring-pet-blue/10
+                        ">
+
+        </div>
+
+
+        <!-- =================================================
+                     BOTÃO
+                ================================================== -->
+
+        <div class="
+                        mt-[25px]
+                    ">
+
+          <button type="submit" id="confirmarCadastro" class="
+                            flex
+                            h-[42px]
+                            w-full
+                            cursor-pointer
+                            items-center
+                            justify-center
+                            rounded-md
+                            border-2
+                            border-pet-red
+                            bg-pet-red
+                            text-sm
+                            font-bold
+                            text-white
+                            shadow-lg
+                            shadow-red-500/30
+                            transition-all
+                            duration-300
+                            ease-in-out
+                            hover:-translate-y-1
+                            hover:scale-[1.02]
+                            hover:bg-red-700
+                            hover:shadow-red-500/40
+                            active:translate-y-0
+                            active:scale-[0.98]
+                        ">
+            Confirmar Cadastro
+          </button>
+          </form>
+        </div>
+
+
+        <!-- =================================================
+                     VOLTAR PARA LOGIN
+                ================================================== -->
+
+        <div class="
+                        mt-5
+                        text-center
+                    ">
+
+          <p class="
+                            text-xs
+                            text-gray-600
+                        ">
+
+            Já possui uma conta?
+
+            <a href="login.html" class="
+                                font-medium
+                                text-pet-blue
+                                transition-colors
+                                duration-200
+                                hover:text-blue-800
+                                hover:underline
+                            ">
+              Entrar
+            </a>
+
+          </p>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+         RODAPÉ
+    ====================================================== -->
+
+  <footer class="
+            flex
+            min-h-[80px]
+            w-full
+            shrink-0
+            items-center
+            justify-center
+            bg-pet-blue
+            px-5
+            text-center
+            text-white
+        ">
+
+    <p class="text-sm">
+      &copy; 2026 Central Pet. Todos os direitos reservados.
+    </p>
+
+  </footer>
+
+
+  
+
+</body>
+
+</html>

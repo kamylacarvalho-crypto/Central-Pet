@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Central Pet - Plataforma de proteção animal, adoção, denúncias, mensagens e doações.">
+
+  <title>Central Pet</title>
+
+  <!-- =====================================================
+       TAILWIND
+  ====================================================== -->
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pet: {
+              orange: '#FFA56D',
+              red: '#E00808',
+              blue: '#0600A9',
+              cream: '#FFEFE5',
+              beige: '#E4B99E',
+              yellow: '#EEEE82'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- =====================================================
+       FONTE
+  ====================================================== -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- =====================================================
+       LUCIDE
+  ====================================================== -->
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- =====================================================
+       CSS
+  ====================================================== -->
+
+  <link rel="stylesheet" href="../css/CentralPet.css">
+
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside id="sidebar" class="sidebar" aria-label="Navegação principal">
+
+      <!-- LOGO -->
+
+      <div class="
+          flex
+          h-[78px]
+          items-center
+          justify-between
+          border-b
+          border-[#E4B99E]/35
+          px-4
+        ">
+
+        <button id="logo-button" type="button" class="
+            group
+            flex
+            min-w-0
+            items-center
+            gap-2.5
+            border-0
+            bg-transparent
+            text-left
+          " aria-label="Ir para a página inicial">
+
+          <img src="../img/logo-centralpet.png" alt="Central Pet" class="
+              h-[42px]
+              w-[42px]
+              object-contain
+              transition-transform
+              duration-200
+              group-hover:scale-105
+            ">
+
+          <span class="flex min-w-0 flex-col">
+
+            <strong class="text-[16px] font-black text-gray-900">
+              Central Pet
+            </strong>
+
+            <span class="mt-0.5 text-[10px] text-gray-400">
+              Proteção e cuidado animal
+            </span>
+
+          </span>
+
+        </button>
+
+
+        <!-- FECHAR MENU -->
+
+        <button id="btn-fechar-menu" type="button" class="
+            flex
+            h-9
+            w-9
+            items-center
+            justify-center
+            rounded-lg
+            border-0
+            bg-transparent
+            text-gray-500
+            transition-all
+            duration-200
+            hover:bg-[#FFEFE5]
+            hover:text-pet-red
+            active:scale-95
+            lg:hidden
+          " aria-label="Fechar menu">
+
+          <i data-lucide="x" class="h-5 w-5"></i>
+
+        </button>
+
+      </div>
+
+
+      <!-- AÇÃO PRINCIPAL -->
+
+      <div id="sidebar-action-container" class="px-4 py-4"></div>
+
+
+      <!-- NAVEGAÇÃO -->
+
+      <nav id="sidebar-nav" class="
+          flex-1
+          overflow-y-auto
+          px-3
+          pb-4
+        " aria-label="Seções da aplicação"></nav>
+
+
+      <!-- PERFIL ÚNICO -->
+
+      <div class="
+          border-t
+          border-[#E4B99E]/35
+          bg-gray-50
+          p-3
+        ">
+
+        <button type="button" data-route="perfil" class="
+            group
+            flex
+            w-full
+            items-center
+            gap-2.5
+            rounded-xl
+            border-0
+            bg-transparent
+            p-2
+            text-left
+            transition-all
+            duration-200
+            hover:bg-[#FFEFE5]
+            active:scale-[0.99]
+          ">
+
+          <div id="sidebar-avatar" class="
+              flex
+              h-[38px]
+              w-[38px]
+              min-w-[38px]
+              items-center
+              justify-center
+              overflow-hidden
+              rounded-full
+              bg-pet-blue
+              text-[12px]
+              font-black
+              text-white
+            ">
+            MS
+          </div>
+
+
+          <div class="
+              flex
+              min-w-0
+              flex-1
+              flex-col
+            ">
+
+            <strong id="sidebar-user-name" class="
+                overflow-hidden
+                text-ellipsis
+                whitespace-nowrap
+                text-[12px]
+                font-bold
+                text-gray-800
+              ">
+              Maria Silva
+            </strong>
+
+            <span id="sidebar-user-role" class="mt-0.5 text-[10px] text-gray-400">
+              Usuária
+            </span>
+
+          </div>
+
+
+          <span class="
+              flex
+              items-center
+              justify-center
+              text-gray-400
+              transition-transform
+              duration-200
+              group-hover:translate-x-1
+            ">
+
+            <i data-lucide="chevron-right" class="h-4 w-4"></i>
+
+          </span>
+
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         OVERLAY MOBILE
+    ====================================================== -->
+
+    <div id="mobile-overlay" class="
+        pointer-events-none
+        fixed
+        inset-0
+        z-40
+        bg-black/40
+        opacity-0
+        transition-opacity
+        duration-200
+        lg:hidden
+      " aria-hidden="true"></div>
+
+
+    <!-- =====================================================
+         ÁREA PRINCIPAL
+    ====================================================== -->
+
+    <div class="main-area">
+
+      <!-- HEADER -->
+
+      <header class="
+          relative
+          z-20
+          flex
+          h-[78px]
+          min-h-[78px]
+          items-center
+          bg-pet-orange
+          px-4
+          text-white
+          shadow-md
+          md:px-6
+        ">
+
+        <div class="
+            flex
+            min-w-0
+            items-center
+            gap-3
+          ">
+
+          <!-- MENU MOBILE -->
+
+          <button id="btn-menu-mobile" type="button" class="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              border-0
+              bg-white/10
+              text-white
+              transition-all
+              duration-200
+              hover:bg-white/20
+              active:scale-95
+              lg:hidden
+            " aria-label="Abrir menu">
+
+            <i data-lucide="menu" class="h-5 w-5"></i>
+
+          </button>
+
+
+          <div class="min-w-0">
+
+            <span id="breadcrumb" class="
+                mb-0.5
+                block
+                text-[10px]
+                opacity-80
+              ">
+              Central Pet
+            </span>
+
+            <h1 id="page-title" class="
+                m-0
+                text-xl
+                font-black
+              ">
+              Adotar
+            </h1>
+
+            <p id="page-subtitle" class="
+                mt-0.5
+                text-[11px]
+                opacity-85
+              ">
+              Encontre um animal esperando por um novo lar.
+            </p>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <!-- CONTEÚDO DINÂMICO -->
+
+      <main id="conteudo" class="main-content"></main>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL
+  ====================================================== -->
+
+  <div id="modal-container" class="
+      pointer-events-none
+      fixed
+      inset-0
+      z-[100]
+      hidden
+      items-center
+      justify-center
+      bg-black/45
+      p-5
+      opacity-0
+      transition-opacity
+      duration-200
+    " aria-hidden="true"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="../js/CentralPet.js"></script>
+
+</body>
+
+</html>
