@@ -4696,7 +4696,7 @@ function renderCaixaEntrada() {
                         justify-center
                         gap-2
                         rounded-xl
-                        bg-pet-red
+                       bg-pet-blue
                         px-5
                         py-3
                         text-xs
@@ -4707,7 +4707,7 @@ function renderCaixaEntrada() {
                         duration-200
 
                         hover:-translate-y-0.5
-                        hover:bg-red-700
+                        hover:bg-blue-800
                         hover:shadow-lg
 
                         active:scale-95
@@ -4921,186 +4921,81 @@ function renderEnviados() {
 }
 
 
-function renderMensagemLista(
-    mensagem
-) {
 
-    const outraPessoa =
+function renderMensagemLista(mensagem) {
 
-        mensagem.tipo ===
-        'recebida'
-
-            ? mensagem.remetente.nome
-
-            : mensagem.destinatario.nome;
-
+    const outraPessoa = mensagem.tipo === 'recebida'
+        ? mensagem.remetente.nome
+        : mensagem.destinatario.nome;
 
     return `
+        <div class="group flex w-full items-center border-b border-gray-100">
 
-        <button
-            type="button"
-
-            onclick="abrirMensagem(${mensagem.id})"
-
-            class="
-                group
-                flex
-                w-full
-                items-center
-                gap-3.5
-                border-0
-                border-b
-                border-gray-100
-                px-4
-                py-4
-                text-left
-
-                transition-all
-                duration-200
-
-                ${
-                    mensagem.lida
-                        ? 'bg-white'
-                        : 'bg-[#FFFCF9]'
-                }
-
-                hover:bg-[#FFF8F3]
-            "
-        >
-
-            <div
-                class="
-                    flex
-                    h-[42px]
-                    w-[42px]
-                    min-w-[42px]
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-pet-blue
-                    text-[11px]
-                    font-black
-                    text-white
-
-                    transition-transform
-                    duration-200
-
-                    group-hover:scale-105
-                "
-            >
-                ${obterIniciais(
-                    outraPessoa
-                )}
-            </div>
-
-
-            <div
-                class="min-w-0 flex-1"
+            <button
+                type="button"
+               onclick="window.abrirMensagem(${mensagem.id})"
+                class="flex min-w-0 flex-1 items-center gap-3.5 px-4 py-4 text-left transition-colors hover:bg-gray-50"
             >
 
-                <div
-                    class="
-                        flex
-                        items-center
-                        justify-between
-                        gap-3
-                    "
-                >
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 font-bold text-orange-600">
+                    ${obterIniciais(outraPessoa)}
+                </div>
 
-                    <span
-                        class="
-                            text-[13px]
-                            font-black
-                            text-slate-800
-                        "
-                    >
-                        ${escaparHTML(
-                            outraPessoa
-                        )}
-                    </span>
+                <div class="min-w-0 flex-1">
 
+                    <div class="flex items-center justify-between gap-3">
 
-                    <span
-                        class="
-                            shrink-0
-                            text-[10px]
-                            text-slate-400
-                        "
-                    >
-                        ${escaparHTML(
-                            mensagem.data
-                        )}
-                    </span>
+                        <span class="truncate text-sm font-bold text-gray-800">
+                            ${escaparHTML(outraPessoa)}
+                        </span>
+
+                        <span class="shrink-0 text-xs text-gray-400">
+                            ${escaparHTML(mensagem.data)}
+                        </span>
+
+                    </div>
+
+                    <p class="truncate text-sm font-semibold text-gray-700">
+                        ${escaparHTML(mensagem.assunto)}
+                    </p>
+
+                    <p class="truncate text-xs text-gray-500">
+                        ${escaparHTML(mensagem.conteudo.replace(/\n/g, ' '))}
+                    </p>
 
                 </div>
 
+                ${mensagem.lida ? '' : `
+                    <span class="h-2 w-2 shrink-0 rounded-full bg-blue-600"></span>
+                `}
 
-                <p
-                    class="
-                        mt-1
-                        text-xs
-                        font-bold
-                        text-slate-600
-                    "
-                >
-                    ${escaparHTML(
-                        mensagem.assunto
-                    )}
-                </p>
+            </button>
 
+            <button
+                type="button"
+                onclick="excluirMensagem(${mensagem.id}, event)"
+                title="Excluir para todos"
+                aria-label="Excluir mensagem para todos"
+                class="mr-3 rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+            >
+                <i data-lucide="trash-2" class="h-4 w-4"></i>
+            </button>
 
-                <p
-                    class="
-                        mt-0.5
-                        overflow-hidden
-                        text-ellipsis
-                        whitespace-nowrap
-                        text-[11px]
-                        text-slate-400
-                    "
-                >
-                    ${escaparHTML(
-                        mensagem.conteudo
-                            .replace(/\n/g, ' ')
-                    )}
-                </p>
-
-            </div>
-
-
-            ${
-                mensagem.lida
-                    ? ''
-                    : `
-                        <span
-                            class="
-                                h-2
-                                w-2
-                                min-w-[8px]
-                                rounded-full
-                                bg-pet-red
-                            "
-                        ></span>
-                    `
-            }
-
-        </button>
-
+        </div>
     `;
-
 }
 
 
 function abrirMensagem(
+    
     id
 ) {
 
-    const mensagem =
-        state.mensagens.find(
-            item =>
-                item.id === id
-        );
-
+   const mensagem =
+    state.mensagens.find(
+        item =>
+            Number(item.id) === Number(id)
+    );
 
     if (!mensagem) {
         return;
@@ -5270,7 +5165,74 @@ function abrirMensagem(
 
 }
 
+
+
 window.abrirMensagem = abrirMensagem;
+
+
+async function excluirMensagem(id, event) {
+
+    if (event) {
+        event.stopPropagation();
+    }
+
+    const confirmar = confirm(
+        'Tem certeza que deseja excluir esta mensagem para todos? Essa ação não poderá ser desfeita.'
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    try {
+
+        const resposta = await fetch('/php/excluirMensagem.php', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+                id_mensagem: id
+            })
+
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.erro || 'Não foi possível excluir a mensagem.'
+            );
+        }
+
+        state.mensagens = state.mensagens.filter(
+            mensagem => Number(mensagem.id) !== Number(id)
+        );
+
+        renderizarPagina();
+        atualizarIcones();
+
+        alert('Mensagem excluída para todos!');
+
+    } catch (erro) {
+
+        console.error('Erro ao excluir mensagem:', erro);
+
+        alert('Erro ao excluir mensagem: ' + erro.message);
+
+    }
+}
+
+window.excluirMensagem = excluirMensagem;
+
 
 
 function abrirModalEmail(
@@ -5518,7 +5480,7 @@ function abrirModalEmail(
 }
 
 window.abrirMensagem = abrirMensagem;
-
+window.abrirModalEmail = abrirModalEmail;
 
 
 async function enviarMensagem(event) {

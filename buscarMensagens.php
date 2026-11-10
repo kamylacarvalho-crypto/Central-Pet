@@ -30,7 +30,7 @@ if (!preg_match('/Bearer\s+(.+)/i', $autorizacao, $matches)) {
 $token = trim($matches[1]);
 
 $resultado = supabaseRequest(
-    "tb_mensagem?select=*&order=data_envio.desc",
+    $endpoint = "tb_mensagem?select=*&excluido_remetente=eq.false&excluido_destinatario=eq.false&order=data_envio.desc",
     "GET",
     null,
     $token
