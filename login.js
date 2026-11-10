@@ -202,15 +202,12 @@ function inicializarLogin() {
             );
 
 
-                    // =================================================
-// LOGIN REAL COM PHP E SUPABASE
-// =================================================
+                  
 
-// =================================================
 // LOGIN REAL COM PHP E SUPABASE
-// =================================================
-
-iniciarCarregamento(submitBtn);
+console.log('E-mail enviado:', email);
+console.log('Senha preenchida:', senha.length > 0);
+console.log('Quantidade de caracteres:', senha.length);
 
 fetch('../php/login.php', {
     method: 'POST',
@@ -227,59 +224,89 @@ fetch('../php/login.php', {
 
     if (!resposta.ok || !dados.sucesso) {
         throw new Error(
-            dados.erro ||
-            dados.msg ||
-            dados.error_description ||
-            'E-mail ou senha incorretos.'
+            dados.erro || 'Não foi possível realizar o login.'
         );
     }
 
     return dados;
 })
-.then(dados => {
-    // Extrai a sessão e o utilizador retornados pelo Supabase através do PHP
+.then(async dados => {
+
     const session = dados.session || {};
     const usuario = session.user || {};
-    const metadados = usuario.user_metadata || {};
 
-    // Normaliza o tipo da conta
-    const tipoRecebido =
-        metadados.tipo ||
-        metadados.tipo_conta ||
-        'usuario';
+    if (!session.access_token || !usuario.id) {
+        throw new Error('Dados da sessão não encontrados.');
+    }
 
-    const tipoPerfil =
-        tipoRecebido === 'orgao_legal'
-            ? 'orgao'
-            : tipoRecebido;
-
-    // Guarda os dados necessários para o perfil no localStorage
-    localStorage.setItem(
-        'centralpet_perfil',
-        JSON.stringify({
-            id: usuario.id || '',
-            nome: metadados.nome || metadados.nome_completo || '',
-            email: usuario.email || email.trim(),
-            telefone: metadados.telefone || '',
-            cidade: metadados.cidade || '',
-            tipo: tipoPerfil,
-            foto: metadados.foto || ''
-        })
+    // Guarda o token
+    sessionStorage.setItem(
+        'centralpet_access_token',
+        session.access_token
     );
 
-    // Guarda o token de acesso para futuras requisições
-    if (session.access_token) {
-        sessionStorage.setItem('centralpet_access_token', session.access_token);
-        localStorage.setItem('supabase_token', session.access_token);
+    localStorage.setItem(
+        'supabase_token',
+        session.access_token
+    );
+
+    // Busca o perfil verdadeiro no banco
+    const respostaPerfil = await fetch(
+        '../php/buscarPerfil.php',
+        {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        }
+    );
+
+    const perfis = await respostaPerfil.json();
+
+    if (!respostaPerfil.ok) {
+        throw new Error(
+            perfis.erro || 'Não foi possível carregar seu perfil.'
+        );
     }
+
+    if (!Array.isArray(perfis) || perfis.length === 0) {
+        throw new Error('Perfil não encontrado no banco de dados.');
+    }
+
+    const perfilBanco = perfis[0];
+
+    // Normaliza o tipo da conta
+    const tipoPerfil =
+        perfilBanco.tipo_conta === 'orgao_legal'
+            ? 'orgao'
+            : perfilBanco.tipo_conta || 'usuario';
+
+    // Monta o perfil com os dados do banco
+    const perfilCompleto = {
+        id: usuario.id,
+        nome: perfilBanco.nome || '',
+        email: usuario.email || email.trim(),
+        telefone: perfilBanco.telefone || '',
+        cidade: perfilBanco.cidade || '',
+        tipo: tipoPerfil,
+        foto: perfilBanco.foto_avatar || ''
+    };
+
+    // Salva o perfil correto
+    localStorage.setItem(
+        'centralpet_perfil',
+        JSON.stringify(perfilCompleto)
+    );
 
     mostrarMensagemSucesso();
 
     setTimeout(() => {
         window.location.href = 'CentralPet.html';
     }, 800);
+
 })
 .catch(erro => {
+
     console.error('Erro no login:', erro);
 
     mostrarErro(
@@ -288,26 +315,25 @@ fetch('../php/login.php', {
     );
 
     animarErroCard(card);
+
 })
 .finally(() => {
+
     submitBtn.disabled = false;
+
     submitBtn.classList.remove(
         'cursor-not-allowed',
         'opacity-80'
     );
+
     submitBtn.innerHTML = 'Entrar';
+
 });
-             
-                mostrarMensagemSucesso();
 
-                setTimeout(() => {
-                    window.location.href = 'CentralPet.html';
-                }, 800);
-
-            })
-           
         }
-    
+    );
+}
+
 
 
 

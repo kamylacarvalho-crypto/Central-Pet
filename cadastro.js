@@ -387,12 +387,10 @@ function inicializarCadastro() {
 // CADASTRO REAL PELO PHP + SUPABASE
 // =================================================
 
-iniciarCarregamento(submitBtn);
 
-// Captura o tipo de conta selecionado
-            const tipoContaSelecionado = document.querySelector(
-                'input[name="tipo_conta"]:checked'
-            );
+const tipoContaSelecionado = document.querySelector(
+    'input[name="tipo_conta"]:checked'
+);
 
             iniciarCarregamento(submitBtn);
 

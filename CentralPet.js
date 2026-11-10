@@ -397,31 +397,7 @@ const state = {
     ],
 
 
-    denuncias: [
-
-        {
-
-            id: 101,
-
-            tipo: 'Maus Tratos / Abuso',
-
-            urgencia: 'Alta',
-
-            status: 'Em análise',
-
-            endereco: 'Rua das Flores, 123 - Centro',
-
-            data: '25/04/2026',
-
-            descricao:
-                'Cachorro mantido acorrentado sem abrigo do sol e sem água.',
-
-            anonimo: false
-
-        }
-
-    ],
-
+    denuncias: [],
 
     mensagens: [
 
@@ -542,13 +518,34 @@ const state = {
 
 };
 
+const paginasValidas = [
+
+    'adotar',
+
+    'denunciar',
+
+    'doar',
+
+    'entrada',
+
+    'enviados',
+
+    'perfil',
+
+    'triagem',
+
+    'gerenciar-doacoes',
+
+    'maus-tratos'
+
+];
+
 
 /* =========================================================
    INICIALIZAÇÃO
 ========================================================= */
 
-document.addEventListener('DOMContentLoaded', () => {
-
+document.addEventListener('DOMContentLoaded', async () => {
     // Recupera os dados da conta que fez login
     const perfilSalvo = localStorage.getItem('centralpet_perfil');
 
@@ -573,7 +570,12 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarInformacoesUsuario();
     atualizarIcones();
 
+    if (state.currentPage === 'denunciar') {
+    await carregarDenuncias();
+}
 });
+
+await carregarMensagens();
 
 /* =========================================================
    LUCIDE
@@ -647,22 +649,26 @@ function configurarEventosGlobais() {
 
 
     window.addEventListener(
-        'hashchange',
-        () => {
+    'hashchange',
+    () => {
 
-            carregarRota();
+        carregarRota();
 
-            renderizarSidebar();
+        renderizarSidebar();
 
-            renderizarPagina();
+        renderizarPagina();
 
-            atualizarInformacoesUsuario();
+        atualizarInformacoesUsuario();
 
-            atualizarIcones();
+        atualizarIcones();
 
+        // Busca as denúncias ao abrir essa página
+        if (state.currentPage === 'denunciar') {
+            carregarDenuncias();
         }
-    );
 
+    }
+);
 
     document.addEventListener(
         'change',
@@ -815,27 +821,6 @@ function tratarChangeGlobal(
    ROTAS
 ========================================================= */
 
-const paginasValidas = [
-
-    'adotar',
-
-    'denunciar',
-
-    'doar',
-
-    'entrada',
-
-    'enviados',
-
-    'perfil',
-
-    'triagem',
-
-    'gerenciar-doacoes',
-
-    'maus-tratos'
-
-];
 
 
 function carregarRota() {
@@ -927,42 +912,35 @@ function navegarPara(
 }
 
 
-function podeAcessarPagina(
-    pagina
-) {
 
+function podeAcessarPagina(pagina) {
+
+    const tipo = state.userProfile?.tipo;
+
+    // Administrador pode acessar todas as páginas
+    if (
+        tipo === 'administrador' ||
+        tipo === 'admin'
+    ) {
+        return true;
+    }
+
+    // Páginas exclusivas para ONG
     if (
         [
             'triagem',
             'gerenciar-doacoes'
-        ].includes(
-            pagina
-        )
+        ].includes(pagina)
     ) {
-
-        return (
-            state.userProfile.tipo ===
-            'orgao'
-        );
-
+        return tipo === 'orgao';
     }
 
-
-    if (
-        pagina ===
-        'maus-tratos'
-    ) {
-
-        return (
-            state.userProfile.tipo ===
-            'usuario'
-        );
-
+    // Página exclusiva para usuário comum
+    if (pagina === 'maus-tratos') {
+        return tipo === 'usuario';
     }
-
 
     return true;
-
 }
 
 
@@ -1357,13 +1335,11 @@ function atualizarInformacoesUsuario() {
 
         cargo.textContent =
 
-            usuario.tipo ===
-            'orgao'
-
-                ? 'Órgão legal'
-
-                : 'Usuária';
-
+           usuario.tipo === 'administrador' || usuario.tipo === 'admin'
+    ? 'Administrador'
+    : usuario.tipo === 'orgao'
+        ? 'Órgão legal'
+        : 'Usuária'
     }
 
 
@@ -2604,7 +2580,11 @@ function abrirDetalhesPet(
 
     atualizarIcones();
 
+
 }
+
+window.abrirDetalhesPet = abrirDetalhesPet;
+
 function iniciarContatoAdocao(nomePet) {
     // 1. Fechar o modal com os detalhes do pet
     fecharModal();
@@ -2618,149 +2598,181 @@ function iniciarContatoAdocao(nomePet) {
     }, 200);
 }
 
+window.iniciarContatoAdocao = iniciarContatoAdocao;
 
 /* =========================================================
    DENÚNCIAS
 ========================================================= */
 
+
 function renderDenuncias() {
 
     return `
 
-        <div
-            class="
-                mx-auto
-                w-full
-                max-w-[1180px]
-                p-4
-                md:p-7
-            "
-        >
+        <div class="mx-auto w-full max-w-[1180px] p-4 md:p-7">
 
-            <div
-                class="
-                    mb-6
-                    flex
-                    flex-col
-                    gap-4
-
-                    md:flex-row
-                    md:items-end
-                    md:justify-between
-                "
-            >
+            <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 
                 <div>
-
-                    <h2
-                        class="text-2xl font-black text-gray-900"
-                    >
+                    <h2 class="text-2xl font-black text-gray-900">
                         Minhas denúncias
                     </h2>
 
-
-                    <p
-                        class="mt-1.5 text-[13px] text-gray-500"
-                    >
+                    <p class="mt-1.5 text-[13px] text-gray-500">
                         Acompanhe o andamento das denúncias realizadas.
                     </p>
-
                 </div>
-
 
                 <button
                     type="button"
                     onclick="abrirModalDenuncia()"
-
-                    class="
-                        group
-                        flex
-                        items-center
-                        justify-center
-                        gap-2
-                        rounded-xl
-                        bg-pet-red
-                        px-5
-                        py-3
-                        text-xs
-                        font-black
-                        text-white
-
-                        transition-all
-                        duration-200
-
-                        hover:-translate-y-0.5
-                        hover:bg-red-700
-                        hover:shadow-lg
-
-                        active:scale-95
-                    "
+                    class="flex items-center justify-center gap-2 rounded-xl bg-pet-red px-5 py-3 text-xs font-black text-white transition-all hover:bg-red-700 hover:shadow-lg active:scale-95"
                 >
-
-                    <i
-                        data-lucide="plus"
-                        class="
-                            h-4
-                            w-4
-
-                            transition-transform
-                            duration-200
-
-                            group-hover:rotate-90
-                        "
-                    ></i>
-
+                    <i data-lucide="plus" class="h-4 w-4"></i>
                     Nova denúncia
-
                 </button>
 
             </div>
 
+            <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
 
-            <div class="space-y-4">
+                <div class="rounded-xl border border-[#E4B99E]/40 bg-white p-4 shadow-sm">
+                    <p class="text-xs font-bold text-gray-500">Total de denúncias</p>
+                    <p class="mt-1 text-2xl font-black text-gray-900">
+                        ${state.denuncias.length}
+                    </p>
+                </div>
+
+                <div class="rounded-xl border border-[#E4B99E]/40 bg-white p-4 shadow-sm">
+                    <p class="text-xs font-bold text-gray-500">Em análise</p>
+                    <p class="mt-1 text-2xl font-black text-amber-600">
+                        ${state.denuncias.filter(d => d.status === 'Em análise').length}
+                    </p>
+                </div>
+
+                <div class="rounded-xl border border-[#E4B99E]/40 bg-white p-4 shadow-sm">
+                    <p class="text-xs font-bold text-gray-500">Recebidas</p>
+                    <p class="mt-1 text-2xl font-black text-blue-700">
+                        ${state.denuncias.filter(d => d.status === 'Recebida').length}
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="overflow-hidden rounded-2xl border border-[#E4B99E]/50 bg-white shadow-sm">
 
                 ${
                     state.denuncias.length
 
-                        ? state.denuncias
-                            .map(
-                                renderDenunciaCard
-                            )
-                            .join('')
+                    ? `
 
-                        : `
+                        <div class="overflow-x-auto">
 
-                            <div
-                                class="
-                                    rounded-2xl
-                                    border
-                                    border-[#E4B99E]/40
-                                    bg-white
-                                    p-10
-                                    text-center
-                                    shadow-sm
-                                "
-                            >
+                            <table class="w-full min-w-[750px] text-left">
 
-                                <i
-                                    data-lucide="clipboard-x"
-                                    class="
-                                        mx-auto
-                                        h-9
-                                        w-9
-                                        text-gray-300
-                                    "
-                                ></i>
+                                <thead class="bg-[#FFEFE5]">
+                                    <tr>
+                                        <th class="px-5 py-4 text-[11px] font-black text-gray-600">PROTOCOLO</th>
+                                        <th class="px-5 py-4 text-[11px] font-black text-gray-600">TIPO</th>
+                                        <th class="px-5 py-4 text-[11px] font-black text-gray-600">URGÊNCIA</th>
+                                        <th class="px-5 py-4 text-[11px] font-black text-gray-600">DATA</th>
+                                        <th class="px-5 py-4 text-[11px] font-black text-gray-600">STATUS</th>
+                                        <th class="px-5 py-4 text-center text-[11px] font-black text-gray-600">AÇÃO</th>
+                                    </tr>
+                                </thead>
 
-                                <h3
-                                    class="mt-4 text-lg font-black"
-                                >
-                                    Nenhuma denúncia registrada
-                                </h3>
+                                <tbody class="divide-y divide-[#E4B99E]/30">
 
-                            </div>
+                                    ${state.denuncias.map(denuncia => `
 
-                        `
+                                        <tr class="transition-colors hover:bg-[#FFF9F5]">
+
+                                            <td class="px-5 py-4 text-xs font-black text-gray-700">
+                                                #${denuncia.id}
+                                            </td>
+
+                                            <td class="px-5 py-4 text-xs font-bold text-gray-800">
+                                                ${escaparHTML(denuncia.tipo)}
+                                            </td>
+
+                                            <td class="px-5 py-4">
+                                                <span class="${
+                                                    denuncia.urgencia === 'Alta'
+                                                        ? 'rounded-full bg-red-100 px-3 py-1 text-[10px] font-black text-red-700'
+                                                        : denuncia.urgencia === 'Média'
+                                                            ? 'rounded-full bg-amber-100 px-3 py-1 text-[10px] font-black text-amber-700'
+                                                            : 'rounded-full bg-green-100 px-3 py-1 text-[10px] font-black text-green-700'
+                                                }">
+                                                    ${escaparHTML(denuncia.urgencia)}
+                                                </span>
+                                            </td>
+
+                                            <td class="px-5 py-4 text-xs text-gray-500">
+                                                ${escaparHTML(denuncia.data)}
+                                            </td>
+
+                                            <td class="px-5 py-4">
+                                                <span class="rounded-full bg-blue-100 px-3 py-1 text-[10px] font-black text-blue-700">
+                                                    ${escaparHTML(denuncia.status)}
+                                                </span>
+                                            </td>
+
+                                            
+<td class="px-5 py-4 text-center">
+    <div class="flex items-center justify-center gap-2">
+
+        <button
+            type="button"
+            onclick="abrirDetalhesDenuncia(${denuncia.id})"
+            class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-black text-pet-blue transition-colors hover:bg-blue-50"
+        >
+            <i data-lucide="eye" class="h-4 w-4"></i>
+            Detalhes
+        </button>
+
+        <button
+            type="button"
+            onclick="excluirDenuncia(${denuncia.id})"
+            class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-xs font-black text-red-600 transition-colors hover:bg-red-50"
+        >
+            <i data-lucide="trash-2" class="h-4 w-4"></i>
+            Excluir
+        </button>
+
+    </div>
+</td>
+
+</tr>
+
+                                        
+
+                                    `).join('')}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    `
+
+                    : `
+
+                        <div class="p-10 text-center">
+
+                            <i data-lucide="clipboard-x" class="mx-auto h-10 w-10 text-gray-300"></i>
+
+                            <h3 class="mt-4 text-lg font-black text-gray-800">
+                                Nenhuma denúncia registrada
+                            </h3>
+
+                            <p class="mt-2 text-sm text-gray-500">
+                                Quando você registrar uma denúncia, ela aparecerá aqui.
+                            </p>
+
+                        </div>
+
+                    `
                 }
 
             </div>
@@ -3551,11 +3563,13 @@ function selecionarDropdown(
 }
 
 
+
 /* =========================================================
    MODAL DENÚNCIA
 ========================================================= */
 
 function abrirModalDenuncia() {
+    
 
     abrirModal(
 
@@ -4066,6 +4080,13 @@ function abrirModalDenuncia() {
 
 }
 
+// Disponibiliza a função para o botão Nova denúncia
+window.abrirModalDenuncia = abrirModalDenuncia;
+
+function lerFotoComoDataURL(
+    arquivo
+) {
+
 function lerFotoComoDataURL(
     arquivo
 ) {
@@ -4108,6 +4129,7 @@ function lerFotoComoDataURL(
 
         }
     );
+}
 }
 
     function mostrarFotoDenuncia(input) {
@@ -4212,167 +4234,396 @@ function lerFotoComoDataURL(
         'hidden'
     );
 }
-    async function enviarDenuncia(
-    event
-) {
+
+// =====================================================
+// CARREGAR DENÚNCIAS DO SUPABASE
+// =====================================================
+
+async function carregarDenuncias() {
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    if (!token) {
+        console.error('Token de autenticação não encontrado.');
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch('../php/buscarDenuncias.php', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.erro || 'Não foi possível carregar as denúncias.'
+            );
+        }
+
+        state.denuncias = resultado.denuncias.map(registro => ({
+
+            id: registro.id_denuncia,
+            tipo: registro.tipo_denuncia,
+            urgencia: registro.urgencia,
+            status: registro.status_denuncia,
+            endereco: registro.endereco_local,
+
+            data: registro.data_denuncia
+                ? registro.data_denuncia.substring(0, 10).split('-').reverse().join('/')
+                : '',
+
+            descricao: registro.descricao,
+            foto: registro.url_provas || '',
+            anonimo: registro.anonima
+
+        }));
+
+        console.log('Denúncias carregadas do Supabase:', state.denuncias);
+
+        if (state.currentPage === 'denunciar') {
+            renderizarPagina();
+            atualizarIcones();
+        }
+
+    } catch (erro) {
+
+        console.error('Erro ao carregar denúncias:', erro);
+
+    }
+}
+
+
+// =====================================================
+// CARREGAR MENSAGENS DO SUPABASE
+// =====================================================
+
+async function carregarMensagens() {
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    if (!token) {
+        console.error('Token de autenticação não encontrado.');
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch('/php/buscarMensagens.php', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.erro || 'Não foi possível carregar as mensagens.'
+            );
+        }
+
+        const perfil = JSON.parse(
+            localStorage.getItem('centralpet_perfil') || '{}'
+        );
+
+        const idUsuario = perfil.id;
+
+        state.mensagens = resultado.mensagens.map(registro => {
+
+            const enviada = registro.id_remetente === idUsuario;
+
+            return {
+
+                id: registro.id_mensagem,
+
+                conversaId:
+                    registro.id_mensagem_origem ||
+                    registro.id_mensagem,
+
+                remetente: {
+                    id: registro.id_remetente,
+                    nome: enviada
+                        ? (perfil.nome || 'Você')
+                        : 'Ong'
+                },
+
+                destinatario: {
+                    id: registro.id_destinatario,
+                    nome: enviada
+                        ? 'Ong'
+                        : (perfil.nome || 'Você')
+                },
+
+                assunto: registro.assunto || '',
+                conteudo: registro.conteudo || '',
+
+                data: registro.data_envio
+                    ? new Date(registro.data_envio).toLocaleString('pt-BR')
+                    : '',
+
+                lida: registro.lida || false,
+
+                tipo: enviada ? 'enviada' : 'recebida',
+
+                anexos: []
+
+            };
+
+        });
+
+        console.log(
+            'Mensagens carregadas do Supabase:',
+            state.mensagens
+        );
+
+        if (
+            state.currentPage === 'enviados' ||
+            state.currentPage === 'recebidas'
+        ) {
+            renderizarPagina();
+            atualizarIcones();
+        }
+
+    } catch (erro) {
+
+        console.error('Erro ao carregar mensagens:', erro);
+
+    }
+}
+
+
+async function excluirDenuncia(id) {
+
+    const confirmar = confirm(
+        'Tem certeza de que deseja excluir esta denúncia? Essa ação não poderá ser desfeita.'
+    );
+
+    if (!confirmar) return;
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    if (!token) {
+        alert('Sua sessão expirou. Faça login novamente.');
+        return;
+    }
+
+    try {
+        const resposta = await fetch(
+            `../php/excluirDenuncia.php?id=${id}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.erro || 'Não foi possível excluir.'
+            );
+        }
+
+        state.denuncias = state.denuncias.filter(
+            denuncia => Number(denuncia.id) !== Number(id)
+        );
+
+        renderizarPagina();
+        atualizarIcones();
+
+        alert('Denúncia excluída com sucesso!');
+
+    } catch (erro) {
+        console.error('Erro ao excluir denúncia:', erro);
+        alert('Erro ao excluir: ' + erro.message);
+    }
+}
+
+
+
+window.excluirDenuncia = excluirDenuncia;
+
+   
+async function enviarDenuncia(event) {
 
     event.preventDefault();
 
+    const botaoEnviar = document.querySelector(
+        '#form-denuncia button[type="submit"]'
+    );
 
-    const tipo =
-        document.getElementById(
-            'den-tipo'
-        ).value;
+    try {
 
+        const tipo = document.getElementById('den-tipo').value;
 
-    const urgencia =
-        document.getElementById(
-            'den-urgencia'
-        ).value;
+        const urgencia = document.getElementById('den-urgencia').value;
 
+        const endereco = document.getElementById('den-endereco').value.trim();
 
-    if (!tipo) {
+        const data = document.getElementById('den-data').value;
+
+        const descricao = document.getElementById('den-desc').value.trim();
+
+        const anonimo = document.getElementById('den-anonimo').checked;
+
+        const inputFoto = document.getElementById('den-foto');
+
+        if (!tipo) {
+            mostrarAviso(
+                'Tipo não selecionado',
+                'Escolha o tipo de denúncia antes de continuar.'
+            );
+            return;
+        }
+
+        if (!endereco || !descricao) {
+            mostrarAviso(
+                'Campos obrigatórios',
+                'Preencha o endereço e a descrição.'
+            );
+            return;
+        }
+
+        // Lê a foto, caso exista
+        let fotoDenuncia = '';
+
+        if (inputFoto && inputFoto.files && inputFoto.files[0]) {
+
+            fotoDenuncia = await lerFotoComoDataURL(
+                inputFoto.files[0]
+            );
+
+        }
+
+        // Recupera o token do usuário autenticado
+        const token =
+            sessionStorage.getItem('centralpet_access_token') ||
+            localStorage.getItem('supabase_token');
+
+        if (!token) {
+            throw new Error(
+                'Sua sessão expirou. Faça login novamente.'
+            );
+        }
+
+        // Impede envio duplicado
+        if (botaoEnviar) {
+            botaoEnviar.disabled = true;
+            botaoEnviar.textContent = 'Enviando...';
+        }
+
+        // Envia a denúncia para o PHP
+        const resposta = await fetch('../php/salvarDenuncia.php', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+
+                tipo: tipo,
+                urgencia: urgencia || 'Média',
+                endereco: endereco,
+                data: data,
+                descricao: descricao,
+                foto: fotoDenuncia,
+                anonimo: anonimo
+
+            })
+
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+
+            console.error(
+                'Erro ao salvar denúncia:',
+                resultado
+            );
+
+            throw new Error(
+                resultado.erro || 'Não foi possível salvar a denúncia.'
+            );
+
+        }
+
+        // Usa os dados realmente retornados pelo Supabase
+        const registro = resultado.denuncia;
+
+        const denuncia = {
+
+            id: registro.id_denuncia,
+            tipo: registro.tipo_denuncia,
+            urgencia: registro.urgencia,
+            status: registro.status_denuncia,
+            endereco: registro.endereco_local,
+            data: data || registro.data_denuncia,
+            descricao: registro.descricao,
+            foto: registro.url_provas || '',
+            anonimo: registro.anonima
+
+        };
+
+        // Atualiza a lista local somente após salvar no banco
+        state.denuncias.unshift(denuncia);
+
+        fecharModal();
+
+        navegarPara('denunciar');
 
         mostrarAviso(
-            'Tipo não selecionado',
-            'Escolha o tipo de denúncia antes de continuar.'
+            'Denúncia registrada',
+            'Sua denúncia foi salva com sucesso!'
         );
 
-        return;
+        console.log(
+            'Denúncia salva no Supabase:',
+            registro
+        );
+
+    } catch (erro) {
+
+        console.error(
+            'Erro ao enviar denúncia:',
+            erro
+        );
+
+        mostrarAviso(
+            'Erro ao registrar denúncia',
+            erro.message
+        );
+
+    } finally {
+
+        if (botaoEnviar) {
+            botaoEnviar.disabled = false;
+            botaoEnviar.innerHTML = `
+                <i data-lucide="send" class="h-4 w-4"></i>
+                Enviar denúncia
+            `;
+
+            atualizarIcones();
+        }
 
     }
-
-        const inputFoto =
-    document.getElementById(
-        'den-foto'
-    );
-
-let fotoDenuncia = '';
-
-if (
-    inputFoto &&
-    inputFoto.files &&
-    inputFoto.files[0]
-) {
-
-    const arquivo =
-        inputFoto.files[0];
-
-    fotoDenuncia =
-        await lerFotoComoDataURL(
-            arquivo
-        );
-}
-    const denuncia = {
-
-        id:
-            Date.now(),
-
-        tipo:
-
-            tipo,
-
-        urgencia:
-
-            urgencia || 'Média',
-
-        status:
-            'Recebida',
-
-        endereco:
-
-            document.getElementById(
-                'den-endereco'
-            ).value,
-
-        data:
-
-            document.getElementById(
-                'den-data'
-            ).value ||
-            'Hoje',
-
-        descricao:
-
-            document.getElementById(
-                'den-desc'
-            ).value,
-            foto:
-                fotoDenuncia,
-
-        anonimo:
-
-            document.getElementById(
-                'den-anonimo'
-            ).checked
-
-    };
-
-
-    state.denuncias.unshift(
-        denuncia
-    );
-
-
-    state.mensagens.unshift({
-
-        id:
-            Date.now() + 1,
-
-        conversaId:
-            denuncia.id,
-
-        remetente: {
-
-            id: 1,
-
-            nome:
-                state.userProfile.nome
-
-        },
-
-        destinatario: {
-
-            id: 20,
-
-            nome:
-                'Órgão de Proteção Animal'
-
-        },
-
-        assunto:
-            `Denúncia #${denuncia.id}`,
-
-        conteudo:
-            'Denúncia registrada pelo usuário.',
-
-        data:
-            agoraFormatado(),
-
-        lida:
-            true,
-
-        tipo:
-            'enviada',
-
-        anexos:
-            []
-
-    });
-
-
-    fecharModal();
-
-
-    navegarPara(
-        'denunciar'
-    );
-
-
-    mostrarAviso(
-        'Denúncia registrada',
-        'Sua denúncia foi registrada. O envio para o órgão ainda é simulado nesta versão.'
-    );
 
 }
 
@@ -4889,35 +5140,33 @@ function abrirMensagem(
                 "
             >
 
-                <div>
+              
+<div class="flex flex-col gap-2">
 
-                    <p
-                        class="
-                            text-xs
-                            font-black
-                            text-gray-800
-                        "
-                    >
-                        ${escaparHTML(
-                            mensagem.remetente.nome
-                        )}
-                    </p>
+    <p class="text-xs font-black text-gray-800">
+        De:
+       ${escaparHTML(
+    mensagem.tipo === 'enviada'
+        ? (
+            state.userProfile.nome ||
+            JSON.parse(
+                localStorage.getItem('centralpet_perfil') || '{}'
+            ).nome ||
+            'Você'
+        )
+        : mensagem.remetente.nome
+)}
+    </p>
 
+    <p class="text-[10px] text-gray-400">
+        Para:
+        ${escaparHTML(
+            mensagem.destinatario.nome
+        )}
+    </p>
 
-                    <p
-                        class="
-                            mt-1
-                            text-[10px]
-                            text-gray-400
-                        "
-                    >
-                        Para:
-                        ${escaparHTML(
-                            mensagem.destinatario.nome
-                        )}
-                    </p>
+</div>
 
-                </div>
 
 
                 <span
@@ -5020,6 +5269,8 @@ function abrirMensagem(
     atualizarIcones();
 
 }
+
+window.abrirMensagem = abrirMensagem;
 
 
 function abrirModalEmail(
@@ -5266,84 +5517,118 @@ function abrirModalEmail(
 
 }
 
+window.abrirMensagem = abrirMensagem;
 
-function enviarMensagem(
-    event
-) {
+
+
+async function enviarMensagem(event) {
 
     event.preventDefault();
 
+    const assunto = document.getElementById('email-assunto').value.trim();
+    const conteudo = document.getElementById('email-msg').value.trim();
 
-    const id =
-        Date.now();
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
 
-
-    state.mensagens.unshift({
-
-        id,
-
-        conversaId:
-            id,
-
-        remetente: {
-
-            id: 1,
-
-            nome:
-                state.userProfile.nome
-
-        },
-
-        destinatario: {
-
-            id: 20,
-
-            nome:
-                document.getElementById(
-                    'email-para'
-                ).value
-
-        },
-
-        assunto:
-            document.getElementById(
-                'email-assunto'
-            ).value,
-
-        conteudo:
-            document.getElementById(
-                'email-msg'
-            ).value,
-
-        data:
-            agoraFormatado(),
-
-        lida:
-            true,
-
-        tipo:
-            'enviada',
-
-        anexos:
-            []
-
-    });
-
-
-    fecharModal();
-
-
-    navegarPara(
-        'enviados'
+    const perfil = JSON.parse(
+        localStorage.getItem('centralpet_perfil') || '{}'
     );
 
+    if (!assunto || !conteudo) {
+        mostrarAviso(
+            'Campos obrigatórios',
+            'Preencha o assunto e a mensagem.'
+        );
+        return;
+    }
 
-    mostrarAviso(
-        'Mensagem enviada',
-        'A mensagem foi adicionada aos Enviados. A resposta será simulada nesta versão.'
-    );
+    if (!token) {
+        mostrarAviso(
+            'Sessão expirada',
+            'Faça login novamente para enviar mensagens.'
+        );
+        return;
+    }
 
+    try {
+
+        const resposta = await fetch('../php/enviarMensagem.php', {
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+                assunto: assunto,
+                conteudo: conteudo
+            })
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            console.error('Erro ao enviar mensagem:', resultado);
+
+            mostrarAviso(
+                'Erro ao enviar',
+                resultado.erro || resultado.mensagem ||
+                'Não foi possível enviar a mensagem.'
+            );
+
+            return;
+        }
+
+        const agora = Date.now();
+
+        state.mensagens.unshift({
+
+            id: agora,
+            conversaId: agora,
+
+            remetente: {
+                id: perfil.id,
+                nome: perfil.nome || 'Você'
+            },
+
+            destinatario: {
+                id: '775c2501-eb33-46a8-a87c-285951cc222f',
+                nome: 'Ong'
+            },
+
+            assunto: assunto,
+            conteudo: conteudo,
+            data: agoraFormatado(),
+            lida: false,
+            tipo: 'enviada',
+            anexos: []
+
+        });
+
+        fecharModal();
+
+        navegarPara('enviados');
+
+        mostrarAviso(
+            'Mensagem enviada!',
+            'Sua mensagem foi salva no Supabase e enviada para a conta Ong.'
+        );
+
+    } catch (erro) {
+
+        console.error('Erro na comunicação:', erro);
+
+        mostrarAviso(
+            'Erro de conexão',
+            'Não foi possível comunicar com o servidor.'
+        );
+
+    }
 }
+
 
 function renderStep(numero, texto) {
 const etapaAtual = state.doacaoState.step;
@@ -6476,12 +6761,11 @@ function renderPerfilUsuario() {
                             "
                         >
                             ${
-                                usuario.tipo ===
-                                'orgao'
-
-                                    ? 'Órgão legal'
-
-                                    : 'Usuária'
+                                usuario.tipo === 'administrador' || usuario.tipo === 'admin'
+    ? 'Administrador'
+    : usuario.tipo === 'orgao'
+        ? 'Órgão legal'
+        : 'Usuária'
                             }
                         </p>
 
@@ -7051,41 +7335,26 @@ function alterarFotoPerfil(
 }
 
 
+
 /* =========================================================
    LOGOUT
 ========================================================= */
 
 function realizarLogout() {
 
-    state.userProfile =
-        {
-            ...INITIAL_USER
-        };
+    // Remove os tokens de autenticação
+    sessionStorage.removeItem('centralpet_access_token');
+    localStorage.removeItem('supabase_token');
 
+    // Remove o perfil da conta que estava conectada
+    localStorage.removeItem('centralpet_perfil');
 
-    state.currentPage =
-        'adotar';
-
-
-    location.hash =
-        '/adotar';
-
-
-    renderizarSidebar();
-
-    renderizarPagina();
-
-    atualizarInformacoesUsuario();
-
-    atualizarIcones();
-
-
-    mostrarAviso(
-        'Sessão encerrada',
-        'No sistema real, aqui ocorrerá o redirecionamento para o login.'
-    );
+    // Redireciona para a tela de login
+    window.location.replace('/html/login.html');
 
 }
+
+window.realizarLogout = realizarLogout;
 
 
 /* =========================================================
@@ -7381,6 +7650,9 @@ function renderColunaTriagem(
     `;
 
 }
+
+
+
 
 
 /* =========================================================
@@ -7713,6 +7985,8 @@ function abrirDetalhesDenuncia(
 
 }
 
+// Disponibiliza a função para os botões
+window.abrirDetalhesDenuncia = abrirDetalhesDenuncia;
 
 function atualizarStatusDenuncia(
     id,
@@ -8811,6 +9085,7 @@ function fecharModal() {
 
 }
 
+window.fecharModal = fecharModal;
 
 /* =========================================================
    AVISOS
