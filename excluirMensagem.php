@@ -3,11 +3,10 @@
 
 header("Content-Type: application/json; charset=UTF-8");
 
-require_once "conexao.php";
+require_once __DIR__ . "/conexao.php";
 
-$headers = function_exists("getallheaders")
-    ? getallheaders()
-    : [];
+// AUTENTICAÇÃO
+$headers = function_exists("getallheaders") ? getallheaders() : [];
 
 $autorizacao =
     $headers["Authorization"]
@@ -17,42 +16,50 @@ $autorizacao =
 
 if (!preg_match('/Bearer\s+(.+)/i', $autorizacao, $matches)) {
     http_response_code(401);
-
     echo json_encode([
         "sucesso" => false,
         "erro" => "Usuário não autenticado."
     ]);
-
     exit;
 }
 
 $token = trim($matches[1]);
 
-$dados = json_decode(
-    file_get_contents("php://input"),
-    true
+// RECEBER DADOS
+$dados = json_decode(file_get_contents("php://input"), true);
+
+$idMensagem = filter_var(
+    $dados["id_mensagem"] ?? null,
+    FILTER_VALIDATE_INT
 );
 
-$idMensagem = $dados["id_mensagem"] ?? null;
-
-if (!$idMensagem || !ctype_digit((string) $idMensagem)) {
+if (!$idMensagem || $idMensagem <= 0) {
     http_response_code(400);
-
     echo json_encode([
         "sucesso" => false,
         "erro" => "ID da mensagem inválido."
     ]);
-
     exit;
 }
 
+// EXCLUSÃO SOMENTE DA CAIXA DA ONG
+$somenteDestinatario =
+    ($dados["somente_destinatario"] ?? false) === true;
+
+$camposExclusao = $somenteDestinatario
+    ? [
+        "excluido_destinatario" => true
+    ]
+    : [
+        "excluido_remetente" => true,
+        "excluido_destinatario" => true
+    ];
+
+// ATUALIZAR SUPABASE
 $resultado = supabaseRequest(
     "tb_mensagem?id_mensagem=eq." . $idMensagem,
     "PATCH",
-    [
-        "excluido_remetente" => true,
-        "excluido_destinatario" => true
-    ],
+    $camposExclusao,
     $token
 );
 
@@ -61,16 +68,16 @@ if (!$resultado["sucesso"]) {
 
     echo json_encode([
         "sucesso" => false,
-        "erro" => $resultado["resposta_original"]
-            ?? "Não foi possível excluir a mensagem."
-    ]);
+        "erro" => "Não foi possível excluir a mensagem.",
+        "detalhes" => $resultado["resposta_original"] ?? null
+    ], JSON_UNESCAPED_UNICODE);
 
     exit;
 }
 
 echo json_encode([
     "sucesso" => true,
-    "mensagem" => "Mensagem excluída para todos."
-]);
+    "mensagem" => "Mensagem removida da caixa da ONG."
+], JSON_UNESCAPED_UNICODE);
 
 ?>

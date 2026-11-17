@@ -4,7 +4,6 @@
 $SUPABASE_URL = "https://wcjmjyqadcevocathzjc.supabase.co";
 $SUPABASE_KEY = "sb_publishable_Y9VlPHzQ-GIdjFzdgOFczw_h75NuF6g";
 
-
 function supabaseRequest(
     $endpoint,
     $metodo = "GET",
@@ -27,37 +26,45 @@ function supabaseRequest(
         $headers[] = "Authorization: Bearer " . $SUPABASE_KEY;
     }
 
+    // Solicitar ao Supabase as linhas afetadas pelo PATCH/POST
+    if (in_array(strtoupper($metodo), ["PATCH", "POST", "DELETE"])) {
+        $headers[] = "Prefer: return=representation";
+    }
+
     $curl = curl_init($url);
 
-    curl_setopt_array($curl, [
+    $opcoes = [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST => $metodo,
-        CURLOPT_HTTPHEADER => $headers
-    ]);
+        CURLOPT_CUSTOMREQUEST => strtoupper($metodo),
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_CONNECTTIMEOUT => 15,
+        CURLOPT_TIMEOUT => 60
+    ];
 
     if ($dados !== null) {
-        curl_setopt(
-            $curl,
-            CURLOPT_POSTFIELDS,
-            json_encode($dados)
+        $opcoes[CURLOPT_POSTFIELDS] = json_encode(
+            $dados,
+            JSON_UNESCAPED_UNICODE
         );
     }
 
+    curl_setopt_array($curl, $opcoes);
+
     $resposta = curl_exec($curl);
     $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $erro = curl_error($curl);
+
+    curl_close($curl);
 
     if ($resposta === false) {
-        $erro = curl_error($curl);
-        curl_close($curl);
-
         return [
             "sucesso" => false,
             "status" => 0,
-            "erro" => $erro
+            "erro" => $erro,
+            "dados" => null,
+            "resposta_original" => null
         ];
     }
-
-    curl_close($curl);
 
     return [
         "sucesso" => $status >= 200 && $status < 300,

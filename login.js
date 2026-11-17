@@ -232,8 +232,13 @@ fetch('../php/login.php', {
 })
 .then(async dados => {
 
-    const session = dados.session || {};
-    const usuario = session.user || {};
+  const session = dados.session || {};
+const usuario = session.user || {};
+
+localStorage.setItem(
+    'supabase_refresh_token',
+    session.refresh_token
+);
 
     if (!session.access_token || !usuario.id) {
         throw new Error('Dados da sessão não encontrados.');

@@ -59,13 +59,13 @@ $mensagem = [
     "conteudo" => $dados["conteudo"]
 ];
 
-// Enviar para o Supabase
 $resultado = supabaseRequest(
     "tb_mensagem",
     "POST",
     $mensagem,
     $token
 );
+
 
 http_response_code(
     $resultado["status"] ?: 500
