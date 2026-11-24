@@ -1,3 +1,4 @@
+
 <?php
 
 header("Content-Type: application/json; charset=UTF-8");
@@ -15,19 +16,18 @@ function responder($sucesso, $dados = [], $status = 200) {
     exit;
 }
 
-// Verifica o método
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     responder(false, ["erro" => "Método não permitido."], 405);
 }
 
-// Recebe os dados
 $dados = json_decode(file_get_contents("php://input"), true);
 
 if (!is_array($dados)) {
     responder(false, ["erro" => "Dados inválidos."], 400);
 }
 
-// Recupera o token
+// AUTENTICAÇÃO
+
 $cabecalhos = getallheaders();
 
 $autorizacao =
@@ -36,12 +36,11 @@ $autorizacao =
     "";
 
 if (!preg_match('/Bearer\s+(.+)/i', $autorizacao, $matches)) {
-    responder(false, ["erro" => "Token de autenticação não enviado."], 401);
+    responder(false, ["erro" => "Token não enviado."], 401);
 }
 
 $token = trim($matches[1]);
 
-// Confirma a identidade do usuário no Supabase Auth
 $curl = curl_init($SUPABASE_URL . "/auth/v1/user");
 
 curl_setopt_array($curl, [
@@ -67,34 +66,41 @@ if ($respostaAuth === false) {
 $usuario = json_decode($respostaAuth, true);
 
 if ($statusAuth !== 200 || empty($usuario["id"])) {
-    responder(false, ["erro" => "Sessão inválida. Faça login novamente."], 401);
+    responder(false, ["erro" => "Sessão inválida."], 401);
 }
 
-// Valida os dados da doação
+// DADOS DA DOAÇÃO
+
 $tipo = trim($dados["tipo_doacao"] ?? "");
 $descricao = trim($dados["descricao_item"] ?? "");
 $pagamento = trim($dados["tipo_pagamento"] ?? "");
 $valor = $dados["valor"] ?? null;
+
+
+
+// VALIDAÇÃO
 
 if ($tipo === "" || $descricao === "" || $pagamento === "") {
     responder(false, ["erro" => "Preencha todos os dados da doação."], 400);
 }
 
 if (!is_numeric($valor) || (float)$valor <= 0) {
-    responder(false, ["erro" => "O valor da doação é inválido."], 400);
+    responder(false, ["erro" => "Valor da doação inválido."], 400);
 }
 
-// Monta o registro
+// REGISTRO DA DOAÇÃO
+
 $doacao = [
     "id_usuario" => $usuario["id"],
     "tipo_doacao" => $tipo,
     "descricao_item" => $descricao,
-    "status_pagamento" => "Pendente",
+    "status_pagamento" => "Confirmado",
     "valor" => (float)$valor,
     "tipo_pagamento" => $pagamento
 ];
 
-// Salva no Supabase
+// ENVIO PARA O SUPABASE
+
 $resultado = supabaseRequest(
     "tb_doacao?select=*",
     "POST",
@@ -112,10 +118,13 @@ if (!$resultado["sucesso"]) {
 $registro = $resultado["dados"][0] ?? null;
 
 if (!$registro) {
-    responder(false, ["erro" => "O Supabase não retornou o registro salvo."], 500);
+    responder(false, [
+        "erro" => "O Supabase não retornou o registro salvo."
+    ], 500);
 }
 
 responder(true, [
     "mensagem" => "Doação registrada com sucesso.",
     "doacao" => $registro
 ]);
+

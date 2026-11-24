@@ -43,6 +43,16 @@ const state = {
 
     filtroEspecie: 'todos',
 
+    // FILTROS DA CENTRAL DE TRIAGEM
+filtroPrioridadeTriagem: 'todas',
+
+filtroStatusTriagem: 'todos',
+
+buscaTriagem: '',
+
+// ORDENAÇÃO DA CENTRAL DE TRIAGEM
+ordenacaoTriagem: 'prioridade',
+
 
     doacaoState: {
 
@@ -54,7 +64,9 @@ const state = {
 
         destino: 'alimentacao',
 
-        pagamento: 'pix'
+        pagamento: 'pix',
+
+       
 
     },
 
@@ -518,27 +530,35 @@ const state = {
 
 };
 
+
 const paginasValidas = [
 
+    // Páginas existentes
     'adotar',
-
     'denunciar',
-
     'doar',
-
     'entrada',
-
     'enviados',
-
     'perfil',
-
     'triagem',
+    'maus-tratos',
+    'banco-racoes',
+    'banco-racoes-usuario',
+    'interesses-racao',
 
-    'gerenciar-doacoes',
-
-    'maus-tratos'
+    // Páginas do administrador
+    'visao-geral-admin',
+    'usuarios-admin',
+    'ongs-admin',
+    'denuncias-admin',
+    'adocoes-admin',
+    'doacoes-admin',
+    'relatorios-admin',
+    'historico-admin',
+    'configuracoes-admin'
 
 ];
+
 
 
 /* =========================================================
@@ -914,6 +934,14 @@ function navegarPara(
 
 
 
+function usuarioEhAdministrador() {
+    const tipo = state.userProfile?.tipo;
+
+    return tipo === 'administrador' ||
+           tipo === 'admin';
+}
+
+
 function podeAcessarPagina(pagina) {
 
     const tipo = state.userProfile?.tipo;
@@ -926,13 +954,8 @@ function podeAcessarPagina(pagina) {
         return true;
     }
 
-    // Páginas exclusivas para ONG
-    if (
-        [
-            'triagem',
-            'gerenciar-doacoes'
-        ].includes(pagina)
-    ) {
+    // Página exclusiva para ONG
+    if (pagina === 'triagem') {
         return tipo === 'orgao';
     }
 
@@ -1058,11 +1081,20 @@ function renderizarSidebar() {
 
 
             ${criarBotaoMenu(
-                'doar',
-                'hand-heart',
-                'Doações'
-            )}
+    'doar',
+    'hand-heart',
+    'Doações'
+)}
 
+${
+    state.userProfile.tipo === 'usuario'
+        ? criarBotaoMenu(
+            'banco-racoes-usuario',
+            'utensils',
+            'Banco de Rações'
+        )
+        : ''
+}
         </div>
 
 
@@ -1102,6 +1134,101 @@ function renderizarSidebar() {
     `;
 
 
+    if (usuarioEhAdministrador()) {
+
+        html = `
+
+            <div class="mb-6">
+
+                <p class="mb-2 px-2.5 text-[10px] font-black uppercase tracking-[0.08em] text-gray-400">
+                    Principal
+                </p>
+
+                ${criarBotaoMenu(
+                    'visao-geral-admin',
+                    'layout-dashboard',
+                    'Visão geral'
+                )}
+
+                ${criarBotaoMenu(
+                    'usuarios-admin',
+                    'users',
+                    'Usuários'
+                )}
+
+                ${criarBotaoMenu(
+                    'ongs-admin',
+                    'building-2',
+                    'Gerenciar ONGs'
+                )}
+
+            </div>
+
+            <div class="mb-6">
+
+                <p class="mb-2 px-2.5 text-[10px] font-black uppercase tracking-[0.08em] text-gray-400">
+                    Fiscalização
+                </p>
+
+                ${criarBotaoMenu(
+                    'denuncias-admin',
+                    'shield-alert',
+                    'Denúncias'
+                )}
+
+                ${criarBotaoMenu(
+                    'adocoes-admin',
+                    'heart',
+                    'Adoções'
+                )}
+
+            </div>
+
+            <div class="mb-6">
+
+                <p class="mb-2 px-2.5 text-[10px] font-black uppercase tracking-[0.08em] text-gray-400">
+                    Gestão
+                </p>
+
+                ${criarBotaoMenu(
+                    'doacoes-admin',
+                    'hand-heart',
+                    'Doações e campanhas'
+                )}
+
+                ${criarBotaoMenu(
+                    'relatorios-admin',
+                    'chart-no-axes-combined',
+                    'Relatórios'
+                )}
+
+            </div>
+
+            <div class="mb-6">
+
+                <p class="mb-2 px-2.5 text-[10px] font-black uppercase tracking-[0.08em] text-gray-400">
+                    Sistema
+                </p>
+
+                ${criarBotaoMenu(
+                    'historico-admin',
+                    'history',
+                    'Histórico de atividades'
+                )}
+
+                ${criarBotaoMenu(
+                    'configuracoes-admin',
+                    'settings',
+                    'Configurações'
+                )}
+
+            </div>
+
+        `;
+
+    } else {
+    
+
     if (
         state.userProfile.tipo ===
         'orgao'
@@ -1134,12 +1261,14 @@ function renderizarSidebar() {
                     true
                 )}
 
+               ${criarBotaoMenu('banco-racoes', 'utensils', 'Banco de Rações')}
 
-                ${criarBotaoMenu(
-                    'gerenciar-doacoes',
-                    'package-check',
-                    'Gerenciar doações'
-                )}
+${criarBotaoMenu(
+    'interesses-racao',
+    'heart-handshake',
+    'Interesses em Doações'
+)}
+              
 
             </div>
 
@@ -1147,7 +1276,7 @@ function renderizarSidebar() {
 
     }
 
-
+}
     nav.innerHTML =
         html;
 
@@ -1421,6 +1550,56 @@ function renderizarPagina() {
         state.currentPage
     ) {
 
+
+       
+case 'visao-geral-admin':
+    atualizarCabecalho(
+        'Visão geral',
+        'Acompanhe tudo o que acontece na Central Pet.'
+    );
+
+    main.innerHTML = renderVisaoGeralAdmin();
+
+    carregarEstatisticasAdmin();
+
+    atualizarIcones();
+
+    break;
+
+    
+case 'usuarios-admin':
+    atualizarCabecalho(
+        'Gerenciar usuários',
+        'Consulte os usuários cadastrados na Central Pet.'
+    );
+
+    main.innerHTML = renderUsuariosAdmin();
+
+    carregarUsuariosAdmin();
+
+    atualizarIcones();
+
+    break;
+
+
+
+c
+case 'ongs-admin':
+    atualizarCabecalho(
+        'Gerenciar ONGs',
+        'Consulte as organizações cadastradas na Central Pet.'
+    );
+
+    main.innerHTML = renderOngsAdmin();
+
+    carregarOngsAdmin();
+
+    atualizarIcones();
+
+    break;
+
+
+
         case 'adotar':
 
             atualizarCabecalho(
@@ -1458,7 +1637,7 @@ function renderizarPagina() {
 
             break;
         
-        case 'doar':
+       case 'doar':
 
     atualizarCabecalho(
         'Doações',
@@ -1467,7 +1646,8 @@ function renderizarPagina() {
 
     main.innerHTML = renderWizardDoacao();
 
-    // Desenha as barras depois que o HTML do boleto existe
+
+    // Desenhar código de barras do boleto
     desenharCodigoBarrasIlustrativo();
 
     break;
@@ -1524,18 +1704,40 @@ function renderizarPagina() {
 
             break;
 
+      
+case 'banco-racoes':
 
-        case 'gerenciar-doacoes':
+    atualizarCabecalho(
+        'Banco de Rações',
+        'Compartilhe e acompanhe as necessidades de alimentação dos animais.'
+    );
 
-            atualizarCabecalho(
-                'Gerenciar doações',
-                'Acompanhe campanhas e recursos recebidos.'
-            );
+    renderBancoRacoes();
 
-            main.innerHTML =
-                renderGerenciarDoacoes();
+    break;
 
-            break;
+
+case 'banco-racoes-usuario':
+
+    atualizarCabecalho(
+        'Banco de Rações',
+        'Confira as necessidades de alimentação das ONGs e saiba como ajudar.'
+    );
+
+    renderBancoRacoesUsuario();
+
+    break;
+
+        case 'interesses-racao':
+
+    atualizarCabecalho(
+        'Interesses em Doações',
+        'Confira os usuários interessados em ajudar sua ONG.'
+    );
+
+    renderInteressesRacao();
+
+    break;
 
 
         default:
@@ -4278,8 +4480,10 @@ state.denuncias = resultado.denuncias.map(registro => ({
     endereco: registro.endereco_local,
 
     data: registro.data_denuncia
-        ? registro.data_denuncia.substring(0, 10).split('-').reverse().join('/')
-        : '',
+    ? registro.data_denuncia.substring(0, 10).split('-').reverse().join('/')
+    : '',
+
+dataOrdenacao: registro.data_denuncia || null,
 
     descricao: registro.descricao,
     foto: registro.url_provas || '',
@@ -4343,6 +4547,11 @@ async function carregarDoacoes() {
         state.doacoes = resultado.doacoes || [];
 
         console.log(
+    
+    Object.keys(state.doacoes[0] || {})
+);
+
+        console.log(
             'Doações carregadas do Supabase:',
             state.doacoes
         );
@@ -4394,6 +4603,16 @@ async function carregarAdocoes() {
         }
 
         state.adocoes = resultado.adocoes || [];
+
+        console.log(
+    'CAMPOS DISPONÍVEIS NOS ANIMAIS:',
+    Object.keys(state.adocoes[0] || {})
+);
+
+console.log(
+    'PRIMEIRO ANIMAL:',
+    state.adocoes[0]
+);
 
         console.log(
             'Adoções carregadas do Supabase:',
@@ -4550,9 +4769,11 @@ async function carregarMensagens() {
 
                 conteudo: registro.conteudo || '',
 
-                data: registro.data_envio
-                    ? new Date(registro.data_envio).toLocaleString('pt-BR')
-                    : '',
+                                data: registro.data_envio
+    ? new Date(registro.data_envio).toLocaleString('pt-BR')
+    : '',
+
+dataOrdenacao: registro.data_envio || null,
 
                 lida: registro.lida || false,
 
@@ -4716,6 +4937,8 @@ async function fetchTriagemComToken(dados) {
 }
 
 
+
+
 /* =====================================================
    ANALISAR MENSAGEM COM INTELIGÊNCIA ARTIFICIAL
 ===================================================== */
@@ -4724,11 +4947,16 @@ async function analisarMensagemIA(idMensagem) {
 
     try {
 
-        console.log('ID DA MENSAGEM ENVIADO:', idMensagem);
-        console.log('TIPO DO ID:', typeof idMensagem);
+        const id = Number(idMensagem);
+
+        if (!Number.isInteger(id) || id <= 0) {
+            throw new Error('ID da mensagem inválido.');
+        }
+
+        console.log('ID DA MENSAGEM ENVIADO:', id);
 
         const resultado = await fetchTriagemComToken({
-            id_mensagem: idMensagem
+            id_mensagem: id
         });
 
         console.log(
@@ -4736,15 +4964,37 @@ async function analisarMensagemIA(idMensagem) {
             resultado.triagem
         );
 
+        // ATUALIZAR AS MENSAGENS
+        if (typeof carregarMensagens === 'function') {
+            await carregarMensagens();
+        }
+
+        // MANTER SELECIONADA A MENSAGEM ANALISADA
+const setorAtual = state.setorTriagemAtual || 'mensagens';
+
+state.registroSelecionadoTriagem = {
+    setor: setorAtual,
+    tipo: 'mensagem',
+    id: id
+};
+
+        // ATUALIZAR O PAINEL DA TRIAGEM
+        const conteudo = document.getElementById(
+            'conteudo-setor-triagem'
+        );
+
+        if (conteudo) {
+            conteudo.innerHTML = renderConteudoSetorTriagem(
+                state.setorTriagemAtual || 'mensagens'
+            );
+
+            atualizarIcones();
+        }
+
         mostrarAviso(
             'Análise concluída!',
             'A mensagem foi classificada pelo Gemini com sucesso.'
         );
-
-        // ATUALIZAR TRIAGEM
-        if (typeof carregarMensagens === 'function') {
-            await carregarMensagens();
-        }
 
         return resultado.triagem;
 
@@ -4763,6 +5013,8 @@ async function analisarMensagemIA(idMensagem) {
     }
 }
 
+window.analisarMensagemIA = analisarMensagemIA;
+
 
 /* =====================================================
    ANALISAR DENÚNCIA COM INTELIGÊNCIA ARTIFICIAL
@@ -4778,10 +5030,7 @@ async function analisarDenunciaIA(idDenuncia) {
             throw new Error('ID da denúncia inválido.');
         }
 
-        console.log(
-            'ID DA DENÚNCIA ENVIADO:',
-            id
-        );
+        console.log('ID DA DENÚNCIA ENVIADO:', id);
 
         const resultado = await fetchTriagemComToken({
             id_denuncia: id
@@ -4792,15 +5041,37 @@ async function analisarDenunciaIA(idDenuncia) {
             resultado.triagem
         );
 
+        // ATUALIZAR AS DENÚNCIAS
+        if (typeof carregarDenuncias === 'function') {
+            await carregarDenuncias();
+        }
+
+      // MANTER SELECIONADA A DENÚNCIA ANALISADA
+const setorAtual = state.setorTriagemAtual || 'denuncias';
+
+state.registroSelecionadoTriagem = {
+    setor: setorAtual,
+    tipo: 'denuncia',
+    id: id
+};
+
+        // ATUALIZAR O PAINEL DA TRIAGEM
+        const conteudo = document.getElementById(
+            'conteudo-setor-triagem'
+        );
+
+        if (conteudo) {
+            conteudo.innerHTML = renderConteudoSetorTriagem(
+                state.setorTriagemAtual || 'denuncias'
+            );
+
+            atualizarIcones();
+        }
+
         mostrarAviso(
             'Análise concluída!',
             'A denúncia foi classificada pelo Gemini com sucesso.'
         );
-
-        // ATUALIZAR DENÚNCIAS
-        if (typeof carregarDenuncias === 'function') {
-            await carregarDenuncias();
-        }
 
         return resultado.triagem;
 
@@ -4818,6 +5089,8 @@ async function analisarDenunciaIA(idDenuncia) {
 
     }
 }
+
+window.analisarDenunciaIA = analisarDenunciaIA;
 
 
 async function salvarEdicaoTriagem(idTriagem) {
@@ -4893,24 +5166,44 @@ window.fecharEdicaoTriagem = fecharEdicaoTriagem;
 
 
 
+
 async function salvarEdicaoTriagem(idTriagem) {
 
-    const categoria = document.getElementById(`editar-categoria-${idTriagem}`).value;
-    const subcategoria = document.getElementById(`editar-subcategoria-${idTriagem}`).value.trim();
-    const prioridade = document.getElementById(`editar-prioridade-${idTriagem}`).value;
+    const categoria = document.getElementById(
+        `editar-categoria-${idTriagem}`
+    )?.value;
+
+    const subcategoria = document.getElementById(
+        `editar-subcategoria-${idTriagem}`
+    )?.value.trim();
+
+    const prioridade = document.getElementById(
+        `editar-prioridade-${idTriagem}`
+    )?.value;
 
     const token =
         sessionStorage.getItem('centralpet_access_token') ||
         localStorage.getItem('supabase_token');
 
     if (!token) {
-        mostrarAviso('Sessão expirada', 'Entre novamente na sua conta.');
+        mostrarAviso(
+            'Sessão expirada',
+            'Entre novamente na sua conta.'
+        );
+        return;
+    }
+
+    if (!categoria || !prioridade) {
+        mostrarAviso(
+            'Campos obrigatórios',
+            'Selecione a categoria e a prioridade.'
+        );
         return;
     }
 
     try {
 
-        const resposta = await fetch('/php/editarTriagem.php', {
+        const resposta = await fetch('../php/editarTriagem.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -4927,37 +5220,36 @@ async function salvarEdicaoTriagem(idTriagem) {
         const resultado = await resposta.json();
 
         if (!resposta.ok || !resultado.sucesso) {
-            throw new Error(resultado.erro || 'Erro ao salvar edição.');
+            throw new Error(
+                resultado.erro || 'Erro ao salvar a classificação.'
+            );
         }
 
-        // Fecha o formulário de edição
-        state.triagemEmEdicao = null;
-
-        // Atualiza os dados
         await carregarMensagens();
         await carregarDenuncias();
 
-        // Mantém a ONG na tela de triagem
         state.currentPage = 'triagem';
 
         renderizarPagina();
 
-        mostrarAviso('Sucesso', 'Triagem atualizada!');
+        mostrarAviso(
+            'Sucesso!',
+            'A classificação da triagem foi atualizada.'
+        );
 
     } catch (erro) {
 
-        console.error('Erro ao editar triagem:', erro);
+        console.error('Erro ao salvar triagem:', erro);
 
-        mostrarAviso('Erro', erro.message);
+        mostrarAviso(
+            'Erro ao salvar',
+            erro.message
+        );
 
     }
 }
 
 window.salvarEdicaoTriagem = salvarEdicaoTriagem;
-
-
-    
-
 
 
 async function excluirDenuncia(id) {
@@ -6401,15 +6693,13 @@ return `
 
 }
 
+
 /* =========================================================
    DOAÇÕES
 ========================================================= */
 
+
 function renderWizardDoacao() {
-
-    const s =
-        state.doacaoState;
-
 
     return `
 
@@ -6423,33 +6713,22 @@ function renderWizardDoacao() {
             "
         >
 
+            <!-- FORMULÁRIO DE DOAÇÃO -->
+
             <div class="mb-6">
 
-                <h2
-                    class="
-                        text-2xl
-                        font-black
-                        text-gray-900
-                    "
-                >
+                <h2 class="text-2xl font-black text-gray-900">
                     Apoie a causa animal
                 </h2>
 
-
-                <p
-                    class="
-                        mt-1.5
-                        text-[13px]
-                        text-gray-500
-                    "
-                >
+                <p class="mt-1.5 text-[13px] text-gray-500">
                     Escolha como deseja contribuir.
                 </p>
 
             </div>
 
-
             <div
+                id="formularioDoacao"
                 class="
                     rounded-2xl
                     border
@@ -6457,26 +6736,16 @@ function renderWizardDoacao() {
                     bg-white
                     p-5
                     shadow-sm
-
                     md:p-6
                 "
             >
 
-                <div
-                    class="
-                        mb-8
-                        flex
-                        items-center
-                    "
-                >
+                <div class="mb-8 flex items-center">
 
                     ${
                         [1,2,3,4]
                             .map(
-                                (
-                                    numero,
-                                    indice
-                                ) => `
+                                (numero, indice) => `
 
                                     ${
                                         indice
@@ -6501,17 +6770,15 @@ function renderWizardDoacao() {
 
                 </div>
 
-
                 ${renderStepContent()}
-                
 
             </div>
 
         </div>
 
     `;
-
 }
+
 function desenharCodigoBarrasIlustrativo() {
     const container = document.getElementById('codigoBarrasBoleto');
     const linha = document.getElementById('linhaDigitavelBoleto');
@@ -7230,9 +7497,12 @@ function avancarDoacao(
 
 }
 
+
+
 async function confirmarDoacao() {
 
     const s = state.doacaoState;
+
     const token =
         sessionStorage.getItem('centralpet_access_token') ||
         localStorage.getItem('supabase_token');
@@ -7251,6 +7521,7 @@ async function confirmarDoacao() {
     }
 
     try {
+
         const resposta = await fetch('../php/salvarDoacao.php', {
             method: 'POST',
             headers: {
@@ -7268,18 +7539,21 @@ async function confirmarDoacao() {
         const dados = await resposta.json();
 
         if (!resposta.ok || !dados.sucesso) {
-            throw new Error(dados.erro || 'Não foi possível registrar a doação.');
+            throw new Error(
+                dados.erro || 'Não foi possível registrar a doação.'
+            );
         }
 
         state.doacaoState.step = 4;
+
         renderizarPagina();
         atualizarIcones();
 
-        mostrarAviso('Doação registrada com sucesso!', 'sucesso');
-
     } catch (erro) {
+
         console.error('Erro ao registrar doação:', erro);
         alert(erro.message);
+
     }
 }
 
@@ -7307,7 +7581,7 @@ function continuarDadosDoacao() {
 
     avancarDoacao(3);
 }
-confirmarDoacao()
+
 
 function resetarDoacao() {
 
@@ -7321,7 +7595,8 @@ function resetarDoacao() {
 
         destino: 'alimentacao',
 
-        pagamento: 'pix'
+        pagamento: 'pix',
+     
 
     };
 
@@ -8140,9 +8415,6 @@ function realizarLogout() {
 window.realizarLogout = realizarLogout;
 
 
-
-
-
 function renderTriagem() {
 
     const mensagens = (state.mensagens || []).filter(
@@ -8150,131 +8422,149 @@ function renderTriagem() {
     );
 
     const denuncias = Array.isArray(state.denuncias)
-        ? state.denuncias
-        : [];
+        ? state.denuncias : [];
+
+    const doacoes = Array.isArray(state.doacoes)
+        ? state.doacoes : [];
+
+    const adocoes = Array.isArray(state.adocoes)
+        ? state.adocoes : [];
+
+    const mensagensAdocao = Array.isArray(state.mensagensAdocao)
+        ? state.mensagensAdocao : [];
 
     const setores = [
-        {
-            id: 'mensagens',
-            nome: 'Mensagens',
-            icone: 'mail',
-            cor: '#0600A9',
-            fundo: '#EEEEFF'
-        },
-        {
-            id: 'doacoes',
-            nome: 'Doações',
-            icone: 'hand-heart',
-            cor: '#D97706',
-            fundo: '#FFF3DF'
-        },
-        {
-            id: 'adocoes',
-            nome: 'Adoções',
-            icone: 'paw-print',
-            cor: '#16A34A',
-            fundo: '#EAF8EF'
-        },
-        {
-            id: 'denuncias',
-            nome: 'Denúncias',
-            icone: 'shield-alert',
-            cor: '#E00808',
-            fundo: '#FDECEC'
-        }
+        { id: 'mensagens', nome: 'Mensagens', icone: 'mail' },
+        { id: 'doacoes', nome: 'Doações', icone: 'hand-heart' },
+        { id: 'adocoes', nome: 'Adoções', icone: 'paw-print' },
+        { id: 'denuncias', nome: 'Denúncias', icone: 'shield-alert' }
     ];
 
-    const total = mensagens.length + denuncias.length;
+    const total = mensagens.length + denuncias.length +
+        doacoes.length + adocoes.length + mensagensAdocao.length;
 
     const prioridadeAlta = denuncias.filter(
         item => String(item.urgencia || '').toLowerCase() === 'alta'
     ).length;
 
-    const criarCard = (titulo, numero, icone, cor, descricao) => `
-        <div class="rounded-2xl border border-[#E4B99E]/50 bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold text-gray-500">${titulo}</p>
-                    <p class="mt-2 text-3xl font-black text-gray-900">${numero}</p>
-                    <p class="mt-1 text-[11px] text-gray-500">${descricao}</p>
-                </div>
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl"
-                    style="background:${cor}18;color:${cor}">
-                    <i data-lucide="${icone}" class="h-6 w-6"></i>
-                </div>
-            </div>
-        </div>
-    `;
+    const cards = [
+        {
+            titulo: 'Mensagens recebidas',
+            numero: mensagens.length,
+            icone: 'mail',
+            cor: '#0600A9'
+        },
+        {
+            titulo: 'Denúncias',
+            numero: denuncias.length,
+            icone: 'shield-alert',
+            cor: '#E00808'
+        },
+        {
+            titulo: 'Alta prioridade',
+            numero: prioridadeAlta,
+            icone: 'alert-circle',
+            cor: '#E00808'
+        },
+        {
+            titulo: 'Registros cadastrados',
+            numero: total,
+            icone: 'inbox',
+            cor: '#D97706'
+        }
+    ];
 
-    const botaoSetor = (setor, ativo = false) => `
-        <button
-            type="button"
-            onclick="selecionarSetorTriagem('${setor.id}')"
-            class="flex min-w-[135px] items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold transition-all
-            ${ativo
-                ? 'border-[#FFA56D] bg-[#FFA56D] text-[#542B16] shadow-sm'
-                : 'border-[#E4B99E]/50 bg-white text-gray-600 hover:bg-[#FFEFE5]'
-            }">
-            <i data-lucide="${setor.icone}" class="h-4 w-4"></i>
-            ${setor.nome}
-        </button>
-    `;
+    state.setorTriagemAtual = state.setorTriagemAtual || 'mensagens';
 
     return `
-        <div class="mx-auto w-full max-w-[1250px] space-y-6 p-4 md:p-7">
+        <div class="w-full space-y-5 p-4 md:p-6">
 
-            <!-- APRESENTAÇÃO -->
-            <section class="overflow-hidden rounded-3xl border border-[#E4B99E]/50 bg-[#FFEFE5] p-6 md:p-8">
-                <div class="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-                    <div>
-                        <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-black text-[#D66B2D]">
-                            <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
-                            CENTRAL PET INTELIGENTE
-                        </span>
+            <!-- CABEÇALHO -->
+            <section class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-[#D97745]">
+                        Central Pet inteligente
+                    </span>
 
-                        <h2 class="mt-4 text-2xl font-black text-[#3D261B] md:text-3xl">
-                            Central de atendimentos
-                        </h2>
+                    <h2 class="mt-1 text-2xl font-black text-[#35251D]">
+                        Central de triagem
+                    </h2>
 
-                        <p class="mt-2 max-w-xl text-sm leading-6 text-[#795B49]">
-                            Acompanhe mensagens, doações, adoções e denúncias em um só lugar.
-                            Organize os atendimentos e cuide de cada solicitação.
-                        </p>
-                    </div>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Organize solicitações e acompanhe os atendimentos da ONG.
+                    </p>
+                </div>
 
-                    <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-white text-[#E97938] shadow-sm">
-                        <i data-lucide="paw-print" class="h-11 w-11"></i>
-                    </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[#E97938] shadow-sm">
+                    <i data-lucide="paw-print" class="h-8 w-8"></i>
                 </div>
             </section>
 
             <!-- INDICADORES -->
-            <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                ${criarCard('Mensagens recebidas', mensagens.length, 'mail', '#0600A9', 'Solicitações recebidas')}
-                ${criarCard('Denúncias registradas', denuncias.length, 'shield-alert', '#E00808', 'Ocorrências cadastradas')}
-                ${criarCard('Alta prioridade', prioridadeAlta, 'alert-circle', '#E00808', 'Denúncias urgentes')}
-                ${criarCard('Atendimentos existentes', total, 'inbox', '#D97706', 'Mensagens e denúncias')}
+            <section class="grid grid-cols-2 gap-3 xl:grid-cols-4">
+
+                ${cards.map(card => `
+                    <article class="rounded-2xl border border-[#E4B99E]/50 bg-white p-4 shadow-sm">
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="text-xs font-bold text-gray-500">
+                                ${card.titulo}
+                            </p>
+
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                                style="background:${card.cor}15;color:${card.cor}">
+                                <i data-lucide="${card.icone}" class="h-5 w-5"></i>
+                            </span>
+                        </div>
+
+                        <p class="mt-2 text-2xl font-black text-gray-900">
+                            ${card.numero}
+                        </p>
+                    </article>
+                `).join('')}
+
             </section>
 
-            <!-- SETORES -->
-            <section class="rounded-2xl border border-[#E4B99E]/50 bg-white p-4 shadow-sm md:p-5">
-                <div class="mb-4">
-                    <h3 class="text-lg font-black text-gray-900">Setores de atendimento</h3>
+            <!-- FILTROS DE SETOR -->
+            <section class="rounded-2xl border border-[#E4B99E]/50 bg-white p-4 shadow-sm">
+
+                <div class="mb-3">
+                    <h3 class="text-sm font-black text-gray-900">
+                        Setores de atendimento
+                    </h3>
+
                     <p class="mt-1 text-xs text-gray-500">
-                        Selecione uma área para visualizar seus registros.
+                        Escolha o tipo de solicitação que deseja acompanhar.
                     </p>
                 </div>
 
                 <div class="flex flex-wrap gap-2" id="botoes-setores-triagem">
-                    ${setores.map((setor, indice) => botaoSetor(setor, indice === 0)).join('')}
+
+                    ${setores.map(setor => `
+                        <button
+                            type="button"
+                            onclick="selecionarSetorTriagem('${setor.id}')"
+                            data-setor="${setor.id}"
+                            class="flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition
+                            ${state.setorTriagemAtual === setor.id
+                                ? 'border-[#FFA56D] bg-[#FFEFE5] text-[#B94E16]'
+                                : 'border-[#E4B99E]/50 bg-white text-gray-600 hover:bg-[#FFF7F1]'
+                            }">
+
+                            <i data-lucide="${setor.icone}" class="h-4 w-4"></i>
+
+                            ${setor.nome}
+                        </button>
+                    `).join('')}
+
                 </div>
             </section>
 
-            <!-- CONTEÚDO DAS ABAS -->
-            <section id="conteudo-setor-triagem"
-                class="min-h-[300px] rounded-2xl border border-[#E4B99E]/50 bg-white p-5 shadow-sm md:p-6">
+            <!-- LISTA E PAINEL DE DETALHES -->
+            <section
+                id="conteudo-setor-triagem"
+                class="min-h-[550px]">
 
-                ${renderConteudoSetorTriagem('mensagens')}
+                ${renderConteudoSetorTriagem(state.setorTriagemAtual)}
 
             </section>
 
@@ -8283,17 +8573,31 @@ function renderTriagem() {
 }
 
 
+
 /* =====================================================
    SELECIONAR SETOR DA TRIAGEM
 ===================================================== */
 
+
 function selecionarSetorTriagem(setor) {
 
-    const conteudo = document.getElementById('conteudo-setor-triagem');
-    const botoes = document.getElementById('botoes-setores-triagem');
+    const conteudo = document.getElementById(
+        'conteudo-setor-triagem'
+    );
+
+    const botoes = document.getElementById(
+        'botoes-setores-triagem'
+    );
 
     if (!conteudo || !botoes) return;
 
+    // Guardar o setor selecionado
+    state.setorTriagemAtual = setor;
+
+    // Limpar o registro selecionado ao trocar de setor
+    state.registroSelecionadoTriagem = null;
+
+    // Atualizar o conteúdo
     conteudo.innerHTML = renderConteudoSetorTriagem(setor);
 
     const setores = {
@@ -8303,33 +8607,35 @@ function selecionarSetorTriagem(setor) {
         denuncias: 'Denúncias'
     };
 
+    // Atualizar o botão ativo
     botoes.querySelectorAll('button').forEach(botao => {
 
-        const ativo = botao.textContent.trim() === setores[setor];
+        const ativo =
+            botao.dataset.setor === setor ||
+            botao.textContent.trim() === setores[setor];
 
         botao.className = ativo
             ? 'flex min-w-[135px] items-center justify-center gap-2 rounded-xl border border-[#FFA56D] bg-[#FFA56D] px-4 py-3 text-sm font-bold text-[#542B16] shadow-sm'
             : 'flex min-w-[135px] items-center justify-center gap-2 rounded-xl border border-[#E4B99E]/50 bg-white px-4 py-3 text-sm font-bold text-gray-600 hover:bg-[#FFEFE5]';
-
     });
 
-    
     atualizarIcones();
 
+    // Carregar dados específicos de cada setor
     if (setor === 'doacoes') {
         carregarDoacoes();
     }
 
-  if (setor === 'adocoes') {
-    carregarAdocoes();
+    if (setor === 'adocoes') {
+        carregarAdocoes();
     }
-
 }
 
 
 
+
 /* =====================================================
-   CONTEÚDO DE CADA SETOR
+   CONTEÚDO DOS SETORES - LISTA + PAINEL LATERAL
 ===================================================== */
 
 function renderConteudoSetorTriagem(setor) {
@@ -8339,33 +8645,41 @@ function renderConteudoSetorTriagem(setor) {
     );
 
     const denuncias = Array.isArray(state.denuncias)
-        ? state.denuncias
-        : [];
+        ? state.denuncias : [];
+
+    const doacoes = Array.isArray(state.doacoes)
+        ? state.doacoes : [];
+
+    const adocoes = Array.isArray(state.adocoes)
+        ? state.adocoes : [];
+
+    const mensagensAdocao = Array.isArray(state.mensagensAdocao)
+        ? state.mensagensAdocao : [];
 
     const configuracoes = {
         mensagens: {
-            titulo: 'Caixa de mensagens',
-            descricao: 'Solicitações e conversas recebidas pela Central Pet.',
-            cor: '#0600A9',
-            icone: 'mail'
-        },
-        doacoes: {
-            titulo: 'Central de doações',
-            descricao: 'Acompanhamento das contribuições e solicitações de ajuda.',
-            cor: '#D97706',
-            icone: 'hand-heart'
-        },
-        adocoes: {
-            titulo: 'Central de adoções',
-            descricao: 'Acompanhamento dos pedidos e interessados em adoção.',
-            cor: '#16A34A',
-            icone: 'paw-print'
+            titulo: 'Mensagens recebidas',
+            descricao: 'Conversas e solicitações enviadas à ONG.',
+            icone: 'mail',
+            cor: '#0600A9'
         },
         denuncias: {
-            titulo: 'Central de denúncias',
-            descricao: 'Ocorrências registradas e análise de prioridade.',
-            cor: '#E00808',
-            icone: 'shield-alert'
+            titulo: 'Denúncias recebidas',
+            descricao: 'Ocorrências que precisam de atenção.',
+            icone: 'shield-alert',
+            cor: '#E00808'
+        },
+        doacoes: {
+            titulo: 'Doações recebidas',
+            descricao: 'Acompanhe as contribuições registradas.',
+            icone: 'hand-heart',
+            cor: '#D97706'
+        },
+        adocoes: {
+            titulo: 'Solicitações de adoção',
+            descricao: 'Interessados e animais cadastrados.',
+            icone: 'paw-print',
+            cor: '#16A34A'
         }
     };
 
@@ -8373,493 +8687,952 @@ function renderConteudoSetorTriagem(setor) {
 
     if (!config) return '';
 
-    let registros = '';
+    let registros = [];
 
     if (setor === 'mensagens') {
+        registros = mensagens.map(item => ({
+            tipo: 'mensagem',
+            id: item.id,
+            titulo: item.assunto || 'Mensagem recebida',
+            descricao: item.conteudo || item.mensagem || '',
+            status: item.triagem?.status_triagem === 'concluida'
+                ? 'Analisada pela IA'
+                : 'Aguardando análise',
+            prioridade: item.triagem?.prioridade || 'Não definida',
+            dataOrdenacao: item.dataOrdenacao || null,
+            original: item
+        }));
+    }
 
-        registros = mensagens.length
-            ? mensagens.map(mensagem => {
+    if (setor === 'denuncias') {
+        registros = denuncias.map(item => ({
+            tipo: 'denuncia',
+            id: item.id,
+            titulo: `Denúncia #${item.id}`,
+            descricao: item.descricao || item.tipo || 'Ocorrência registrada',
+            status: item.status || 'Recebida',
+            prioridade: item.triagem?.prioridade || item.urgencia || 'Não definida',
+            dataOrdenacao: item.dataOrdenacao || null,
+            original: item
+        }));
+    }
 
-                const triagem = mensagem.triagem;
-                const analisada = triagem?.status_triagem === 'concluida';
+    if (setor === 'doacoes') {
+        registros = doacoes.map(item => ({
+            tipo: 'doacao',
+            id: item.id_doacao,
+            titulo: `Doação #${item.id_doacao}`,
+            descricao: item.descricao_item || item.tipo_doacao || 'Doação registrada',
+            status: item.status_pagamento || 'Pendente',
+            prioridade: 'Não se aplica',
+            dataOrdenacao: item.data_doacao || null,
+            original: item
+        }));
+    }
 
-                return `
-                    <article class="rounded-2xl border border-[#E4B99E]/50 bg-white p-5 transition hover:shadow-md">
+    if (setor === 'adocoes') {
 
-                        <div class="flex flex-wrap items-center justify-between gap-3">
-                            <div>
-                                <p class="text-sm font-black text-gray-900">
-                                    ${escaparHTML(mensagem.assunto || 'Mensagem recebida')}
-                                </p>
-                                <p class="mt-1 text-xs text-gray-500">
-                                    Mensagem #${Number(mensagem.id)}
-                                </p>
-                            </div>
+       const pedidos = mensagensAdocao.map(item => ({
+    tipo: 'mensagemAdocao',
+    id: item.id,
+    titulo: item.assunto || 'Interesse em adoção',
+    descricao: item.conteudo || 'Solicitação de adoção',
+    status: 'Interesse recebido',
+    prioridade: item.triagem?.prioridade || 'Não definida',
+    dataOrdenacao: item.dataOrdenacao || null,
+    original: item
+}));
 
-                            <span class="rounded-full px-3 py-1 text-xs font-bold"
-                                style="background:${analisada ? '#EAF8EF' : '#FFF3DF'};color:${analisada ? '#16803D' : '#B76A12'}">
-                                ${analisada ? 'Analisada pela IA' : 'Aguardando análise'}
-                            </span>
-                        </div>
+      const animais = adocoes.map(item => ({
+    tipo: 'animal',
+    id: item.id_animal,
+    titulo: item.nome_animal || 'Animal sem nome',
+    descricao: `${item.raca_animal || 'Raça não informada'} · ${item.porte || 'Porte não informado'}`,
+    status: item.status || 'Cadastrado',
+    prioridade: 'Não se aplica',
+    dataOrdenacao: item.data_resgate || null,
+    original: item
+}));
 
-                        <p class="mt-4 text-sm leading-6 text-gray-600">
-                            ${escaparHTML(mensagem.conteudo || mensagem.mensagem || '')}
-                        </p>
+        registros = [...pedidos, ...animais];
+    }
+    /* =========================================
+       APLICAR FILTROS DE PRIORIDADE E STATUS
+    ========================================= */
 
-                        ${analisada ? `
-                            <div class="mt-4 rounded-xl bg-[#FFEFE5] p-4">
-                                <p class="text-xs font-black text-[#A94D1C]">ANÁLISE DO GEMINI</p>
-                                <p class="mt-2 text-sm font-bold text-gray-800">
-                                    ${escaparHTML(triagem.selo_categoria || 'Categoria não informada')}
-                                </p>
-                                <p class="mt-1 text-xs text-gray-600">
-                                    Subcategoria: ${escaparHTML(triagem.subcategoria || 'Não informada')}
-                                </p>
-                                <p class="mt-2 text-sm text-gray-700">
-                                    ${escaparHTML(triagem.resumo_ia || 'Sem resumo disponível.')}
-                                </p>
-                                <p class="mt-2 text-xs text-gray-500">
-                                    ${escaparHTML(triagem.justificativa_ia || '')}
-                                </p>
-                                ${formularioEdicaoTriagemCentral(triagem)}
-                            </div>
-                        
-                          ` : `
-                            <button onclick="analisarMensagemIA(${Number(mensagem.id)})"
-                                class="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#0600A9] px-4 py-2.5 text-xs font-bold text-white hover:opacity-90">
-                                <i data-lucide="sparkles" class="h-4 w-4"></i>
-                                Analisar com IA
-                            </button>
-                                               `}
+    const normalizarFiltroTriagem = valor =>
+        String(valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '_');
 
-                        <!-- BOTÃO EXCLUIR MENSAGEM -->
-                        <div class="mt-4 flex justify-end border-t border-[#E4B99E]/40 pt-3">
+    const filtroPrioridade =
+        state.filtroPrioridadeTriagem || 'todas';
 
-                            <button
-                                type="button"
-                                onclick="excluirMensagemTriagem(${Number(mensagem.id)})"
-                                title="Excluir mensagem"
-                                aria-label="Excluir mensagem"
-                                class="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E4B99E] text-red-600 transition hover:bg-red-50 hover:border-red-300">
+    const filtroStatus =
+        state.filtroStatusTriagem || 'todos';
 
-                                <i data-lucide="trash-2" class="h-5 w-5"></i>
+    const termoBusca = normalizarFiltroTriagem(
+    state.buscaTriagem || ''
+).replace(/_/g, ' ');
 
-                            </button>
+const registrosFiltrados = registros.filter(item => {
 
-                        </div>
+    const prioridade = normalizarFiltroTriagem(item.prioridade);
+    const status = normalizarFiltroTriagem(item.status);
 
-                    </article>
-                `;
-            }).join('')
-            : mensagemVaziaTriagem('Nenhuma mensagem recebida.');
+    const prioridadeCorresponde =
+        filtroPrioridade === 'todas' ||
+        prioridade === filtroPrioridade;
 
-    } else if (setor === 'denuncias') {
-                                                                  
-                  
-              
-        registros = denuncias.length
-            ? denuncias.map(denuncia => {
+    const statusCorresponde =
+        filtroStatus === 'todos' ||
+        status === filtroStatus;
 
-                const triagem = denuncia.triagem;
-                const analisada = triagem?.status_triagem === 'concluida';
+    const textoPesquisa = normalizarFiltroTriagem([
+        item.titulo,
+        item.descricao,
+        item.status,
+        item.prioridade,
+        item.original?.nome_animal,
+        item.original?.assunto,
+        item.original?.tipo,
+        item.original?.remetente?.nome,
+        item.original?.endereco
+    ].filter(Boolean).join(' ')).replace(/_/g, ' ');
 
-                return `
-                    <article class="rounded-2xl border border-[#E4B99E]/50 bg-white p-5 transition hover:shadow-md">
+    const buscaCorresponde =
+        !termoBusca ||
+        textoPesquisa.includes(termoBusca);
 
-                        <div class="flex flex-wrap items-center justify-between gap-3">
-                            <div>
-                                <p class="text-sm font-black text-gray-900">
-                                    Denúncia #${Number(denuncia.id)}
-                                </p>
-                                <p class="mt-1 text-xs text-gray-500">
-                                    ${escaparHTML(denuncia.tipo || 'Ocorrência')}
-                                </p>
-                            </div>
+    return prioridadeCorresponde &&
+        statusCorresponde &&
+        buscaCorresponde;
+});
 
-                            <span class="rounded-full bg-[#FDECEC] px-3 py-1 text-xs font-bold text-[#E00808]">
-                                ${escaparHTML(denuncia.urgencia || 'Não informada')}
-                            </span>
-                        </div>
+/* =====================================================
+   ORDENAR REGISTROS DA CENTRAL DE TRIAGEM
+===================================================== */
 
-                        <p class="mt-4 text-sm leading-6 text-gray-600">
-                            ${escaparHTML(denuncia.descricao || '')}
-                        </p>
+const ordemPrioridade = {
+    alta: 1,
+    media: 2,
+    baixa: 3,
+    'nao definida': 4,
+    'nao se aplica': 5
+};
 
-                        <p class="mt-3 text-xs text-gray-500">
-                            Local: ${escaparHTML(denuncia.endereco || 'Não informado')}
-                        </p>
+const registrosOrdenados = [...registrosFiltrados];
 
-                        <p class="mt-1 text-xs text-gray-500">
-                            Status: ${escaparHTML(denuncia.status || 'Recebida')}
-                        </p>
+if (state.ordenacaoTriagem === 'prioridade') {
 
-                        ${analisada ? `
-                            <div class="mt-4 rounded-xl bg-[#FFEFE5] p-4">
-                                <p class="text-xs font-black text-[#A94D1C]">ANÁLISE DO GEMINI</p>
-                                <p class="mt-2 text-sm font-bold text-gray-800">
-                                    ${escaparHTML(triagem.selo_categoria || 'Denúncia')}
-                                </p>
-                                <p class="mt-1 text-xs text-gray-600">
-                                    Prioridade: ${escaparHTML(triagem.prioridade || 'Não informada')}
-                                </p>
-                                <p class="mt-1 text-xs text-gray-600">
-                                    ${escaparHTML(triagem.subcategoria || '')}
-                                </p>
-                                <p class="mt-3 text-sm text-gray-700">
-                                    ${escaparHTML(triagem.resumo_ia || 'Sem resumo disponível.')}
-                                </p>
-                                <p class="mt-2 text-xs text-gray-500">
-                                    ${escaparHTML(triagem.justificativa_ia || '')}
-                                </p>
-                                ${formularioEdicaoTriagemCentral(triagem)}
-                            </div>
-                        ` : `
-                            <button onclick="analisarDenunciaIA(${Number(denuncia.id)})"
-                                class="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#E00808] px-4 py-2.5 text-xs font-bold text-white hover:opacity-90">
-                                <i data-lucide="sparkles" class="h-4 w-4"></i>
-                                Analisar com IA
-                            </button>
-                        `}
-                                               
+    registrosOrdenados.sort((a, b) => {
 
-                        <!-- BOTÃO EXCLUIR DENÚNCIA -->
-                        <div class="mt-4 flex justify-end border-t border-[#E4B99E]/40 pt-3">
+        const prioridadeA = normalizarFiltroTriagem(a.prioridade)
+            .replace(/_/g, ' ');
 
-                            <button
-                                type="button"
-                                onclick="excluirDenuncia(${Number(denuncia.id)})"
-                                title="Excluir denúncia"
-                                aria-label="Excluir denúncia"
-                                class="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E4B99E] text-red-600 transition hover:bg-red-50 hover:border-red-300">
+        const prioridadeB = normalizarFiltroTriagem(b.prioridade)
+            .replace(/_/g, ' ');
 
-                                <i data-lucide="trash-2" class="h-5 w-5"></i>
+        return (ordemPrioridade[prioridadeA] || 6) -
+               (ordemPrioridade[prioridadeB] || 6);
+    });
 
-                            </button>
+} else if (state.ordenacaoTriagem === 'recentes') {
 
-                        </div>
+    registrosOrdenados.sort((a, b) => {
 
-                    
-                    </article>
-                `;
-            }).join('')
-            : mensagemVaziaTriagem('Nenhuma denúncia registrada.');
+        const dataA = a.dataOrdenacao
+            ? new Date(a.dataOrdenacao).getTime()
+            : 0;
 
-  
-} else if (setor === 'doacoes') {
+        const dataB = b.dataOrdenacao
+            ? new Date(b.dataOrdenacao).getTime()
+            : 0;
 
-    const doacoes = Array.isArray(state.doacoes)
-        ? state.doacoes
-        : [];
+        return dataB - dataA;
+    });
 
-    registros = doacoes.length
-        ? doacoes.map(doacao => {
+}
 
-            const valor = Number(doacao.valor || 0);
+    /* =========================================
+       VERIFICAR REGISTRO SELECIONADO
+    ========================================= */
 
-            const data = doacao.data_doacao
-                ? new Date(doacao.data_doacao).toLocaleDateString('pt-BR')
-                : 'Data não informada';
+    if (
+        !state.registroSelecionadoTriagem ||
+        state.registroSelecionadoTriagem.setor !== setor ||
+        !registrosFiltrados.some(item =>
+            item.tipo === state.registroSelecionadoTriagem.tipo &&
+            String(item.id) === String(state.registroSelecionadoTriagem.id)
+        )
+    ) {
+        state.registroSelecionadoTriagem = registrosFiltrados.length
+            ? {
+                setor,
+                tipo: registrosFiltrados[0].tipo,
+                id: registrosFiltrados[0].id
+            }
+            : null;
+    }
 
+    const selecionado = registrosFiltrados.find(item =>
+        state.registroSelecionadoTriagem &&
+        item.tipo === state.registroSelecionadoTriagem.tipo &&
+        String(item.id) === String(state.registroSelecionadoTriagem.id)
+    );
+
+    
+    const lista = registrosFiltrados.length
+  ? registrosOrdenados.map(item => {
+            const ativo = selecionado &&
+                selecionado.tipo === item.tipo &&
+                String(selecionado.id) === String(item.id);
+
+           const prioridadeNormalizada = String(item.prioridade || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+
+const estilosPrioridade = {
+    alta: 'background:#FDECEC; color:#E00808;',
+    media: 'background:#FFF4D6; color:#A16207;',
+    baixa: 'background:#E8F5E9; color:#218838;',
+    'nao definida': 'background:#F2F2F2; color:#666666;',
+    'nao se aplica': 'background:#F2F2F2; color:#666666;'
+};
             return `
-                <article class="rounded-2xl border border-[#E4B99E]/50 bg-white p-5 transition hover:shadow-md">
+                <button
+                    type="button"
+                    onclick="abrirRegistroTriagem('${setor}','${item.tipo}',${Number(item.id)})"
+                    class="w-full rounded-xl border p-4 text-left transition
+                    ${ativo
+                        ? 'border-[#FFA56D] bg-[#FFF5EE] shadow-sm'
+                        : 'border-[#EADDD4] bg-white hover:bg-[#FFF9F5]'
+                    }">
 
-                    <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-start justify-between gap-2">
+
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-black text-gray-800">
+                                ${escaparHTML(item.titulo)}
+                            </p>
+
+                            <p class="mt-1 line-clamp-2 text-xs leading-5 text-gray-500">
+                                ${escaparHTML(item.descricao)}
+                            </p>
+                        </div>
+
+                        <span
+    class="shrink-0 rounded-full px-2 py-1 text-[10px] font-bold"
+    style="${estilosPrioridade[prioridadeNormalizada] || 'background:#F2F2F2; color:#666666;'}">
+
+    ${escaparHTML(item.prioridade)}
+
+</span>
+
+                    </div>
+
+                    <div class="mt-3 flex items-center justify-between gap-2">
+                        <span class="text-[11px] text-gray-500">
+                            ${escaparHTML(item.status)}
+                        </span>
+
+                        <span class="text-[11px] font-bold text-[#B95D2B]">
+                            Ver detalhes →
+                        </span>
+                    </div>
+
+                </button>
+            `;
+        }).join('')
+        : `
+            <div class="rounded-xl border border-dashed border-[#E4B99E] p-8 text-center">
+                <i data-lucide="${config.icone}" class="mx-auto h-9 w-9 text-gray-300"></i>
+                <p class="mt-3 text-sm font-bold text-gray-600">
+                    Nenhum registro encontrado.
+                </p>
+                <p class="mt-1 text-xs text-gray-400">
+                    Quando houver novas solicitações, elas aparecerão aqui.
+                </p>
+            </div>
+        `;
+
+    return `
+        <div class="grid min-h-[550px] grid-cols-1 gap-4 xl:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.5fr)]">
+
+            <!-- LISTA DE SOLICITAÇÕES -->
+            <section class="overflow-hidden rounded-2xl border border-[#E4B99E]/50 bg-white shadow-sm">
+
+                <div class="border-b border-[#EADDD4] p-4">
+                    <div class="flex items-center justify-between gap-2">
 
                         <div>
-                            <p class="text-sm font-black text-gray-900">
-                                Doação #${Number(doacao.id_doacao)}
-                            </p>
+                            <h3 class="text-sm font-black text-gray-900">
+                                ${config.titulo}
+                            </h3>
 
                             <p class="mt-1 text-xs text-gray-500">
-                                ${escaparHTML(doacao.tipo_doacao || 'Doação')}
+                                ${config.descricao}
                             </p>
                         </div>
 
-                        <span class="rounded-full bg-[#FFF3DF] px-3 py-1 text-xs font-bold text-[#B76A12]">
-                            ${escaparHTML(doacao.status_pagamento || 'Pendente')}
+                        <span class="rounded-full bg-[#FFEFE5] px-3 py-1 text-xs font-black text-[#A94D1C]">
+                           ${registrosFiltrados.length}
                         </span>
 
                     </div>
+                                </div>
 
-                    <div class="mt-4 rounded-xl bg-[#FFF8EF] p-4">
+<!-- BUSCA DE REGISTROS -->
+<div class="border-b border-[#EADDD4] p-3">
 
-                        <p class="text-xs font-bold text-gray-500">
-                            VALOR DA DOAÇÃO
-                        </p>
+    <div class="relative">
 
-                        <p class="mt-1 text-2xl font-black text-[#D97706]">
-                            ${valor.toLocaleString('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL'
-                            })}
-                        </p>
+        <i
+            data-lucide="search"
+            class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400">
+        </i>
 
-                    </div>
+        <input
+            id="busca-registros-triagem"
+            type="search"
+            value="${escaparHTML(state.buscaTriagem || '')}"
+            oninput="atualizarBuscaTriagem(this.value)"
+            placeholder="Buscar por nome, assunto ou conteúdo..."
+            class="w-full rounded-xl border border-[#E4B99E] bg-white py-3 pl-10 pr-3 text-xs text-gray-700 outline-none focus:border-[#FFA56D] focus:ring-2 focus:ring-[#FFA56D]/20"
+        >
 
-                    <div class="mt-4 space-y-2">
-
-                        <p class="text-sm text-gray-600">
-                            <strong>Destino:</strong>
-                            ${escaparHTML(doacao.descricao_item || 'Não informado')}
-                        </p>
-
-                        <p class="text-sm text-gray-600">
-                            <strong>Pagamento:</strong>
-                            ${escaparHTML(doacao.tipo_pagamento || 'Não informado')}
-                        </p>
-
-                        <p class="text-sm text-gray-600">
-                            <strong>Data:</strong> ${data}
-                        </p>
-
-                                      </div>
-
-                    <!-- BOTÃO EXCLUIR DOAÇÃO -->
-                    <div class="mt-4 flex justify-end border-t border-[#E4B99E]/40 pt-3">
-
-                        <button
-                            type="button"
-                            onclick="excluirDoacaoTriagem(${Number(doacao.id_doacao)})"
-                            title="Excluir doação"
-                            aria-label="Excluir doação"
-                            class="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E4B99E] text-red-600 transition hover:bg-red-50 hover:border-red-300">
-
-                            <i data-lucide="trash-2" class="h-5 w-5"></i>
-
-                        </button>
-
-                    </div>
-
-                </article>
-            `;
-
-      
-        }).join('')
-        : mensagemVaziaTriagem('Nenhuma doação registrada.');
-
-
-
-} else if (setor === 'adocoes') {
-
-    const adocoes = Array.isArray(state.adocoes)
-        ? state.adocoes
-        : [];
-
-    const mensagensAdocao = Array.isArray(state.mensagensAdocao)
-        ? state.mensagensAdocao
-        : [];
-
-    // ANIMAIS CADASTRADOS PARA ADOÇÃO
-    const registrosAnimais = adocoes.map(animal => {
-
-        const data = animal.data_resgate
-            ? new Date(animal.data_resgate).toLocaleDateString('pt-BR')
-            : 'Não informada';
-
-        return `
-            <article class="rounded-2xl border border-[#E4B99E]/50 bg-white p-5 transition hover:shadow-md">
-
-                <div class="flex flex-wrap items-center justify-between gap-3">
-
-                    <div>
-                        <p class="text-sm font-black text-gray-900">
-                            ${escaparHTML(animal.nome_animal || 'Animal sem nome')}
-                        </p>
-
-                        <p class="mt-1 text-xs text-gray-500">
-                            Animal #${Number(animal.id_animal)}
-                        </p>
-                    </div>
-
-                    <span class="rounded-full bg-[#EAF8EF] px-3 py-1 text-xs font-bold text-[#16803D]">
-                        ${escaparHTML(animal.status || 'Cadastrado')}
-                    </span>
-
-                </div>
-
-                ${animal.url_midia ? `
-                    <img
-                        src="${escaparHTML(animal.url_midia)}"
-                        alt="Foto do animal"
-                        class="mt-4 h-48 w-full rounded-xl object-cover"
-                    >
-                ` : ''}
-
-                <div class="mt-4 grid grid-cols-2 gap-3">
-
-                    <p class="text-sm text-gray-600">
-                        <strong>Raça:</strong><br>
-                        ${escaparHTML(animal.raca_animal || 'Não informada')}
-                    </p>
-
-                    <p class="text-sm text-gray-600">
-                        <strong>Idade:</strong><br>
-                        ${escaparHTML(animal.idade_aproximada || 'Não informada')}
-                    </p>
-
-                    <p class="text-sm text-gray-600">
-                        <strong>Porte:</strong><br>
-                        ${escaparHTML(animal.porte || 'Não informado')}
-                    </p>
-
-                    <p class="text-sm text-gray-600">
-                        <strong>Saúde:</strong><br>
-                        ${escaparHTML(animal.status_saude || 'Não informada')}
-                    </p>
-
-                </div>
-
-               <p class="mt-4 text-xs text-gray-500">
-    Data do resgate: ${data}
-</p>
-
-<!-- BOTÃO EXCLUIR ANIMAL -->
-<div class="mt-4 flex justify-end border-t border-[#E4B99E]/40 pt-3">
-
-    <button
-        type="button"
-        onclick="excluirAnimalAdocao(${Number(animal.id_animal)})"
-        title="Excluir animal"
-        aria-label="Excluir animal"
-        class="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E4B99E] text-red-600 transition hover:bg-red-50 hover:border-red-300">
-
-        <i data-lucide="trash-2" class="h-5 w-5"></i>
-
-    </button>
+    </div>
 
 </div>
 
-</article>
-        `;
-    });
+<!-- ORDENAÇÃO DOS REGISTROS -->
+<div class="border-b border-[#EADDD4] px-3 py-3">
 
+    <div class="flex items-center justify-between gap-2">
 
-    // MENSAGENS CLASSIFICADAS COMO ADOÇÃO
-    const registrosMensagens = mensagensAdocao.map(mensagem => {
+        <label
+            for="ordenacao-registros-triagem"
+            class="flex items-center gap-2 text-xs font-bold text-gray-600">
 
-        let triagem = mensagem.triagem;
+            <i data-lucide="arrow-down-wide-narrow"
+               class="h-4 w-4 text-[#FFA56D]"></i>
 
-        if (Array.isArray(triagem)) {
-            triagem = triagem[0] || {};
-        }
+            Ordenar por
 
-        const prioridade = String(
-            triagem?.prioridade || 'Não definida'
-        );
+        </label>
 
-        return `
-            <article class="rounded-2xl border border-[#E4B99E]/50 bg-white p-5 transition hover:shadow-md">
+        <select
+            id="ordenacao-registros-triagem"
+            onchange="atualizarOrdenacaoTriagem(this.value)"
+            class="rounded-lg border border-[#E4B99E] bg-white px-3 py-2 text-xs text-gray-700 outline-none focus:border-[#FFA56D]">
 
-                <div class="flex flex-wrap items-center justify-between gap-3">
+            <option
+                value="prioridade"
+                ${state.ordenacaoTriagem === 'prioridade' ? 'selected' : ''}>
+                Maior prioridade
+            </option>
 
-                    <div>
-                        <p class="text-sm font-black text-gray-900">
-                            ${escaparHTML(mensagem.assunto || 'Interesse em adoção')}
-                        </p>
+            <option
+                value="recentes"
+                ${state.ordenacaoTriagem === 'recentes' ? 'selected' : ''}>
+                Mais recentes
+            </option>
 
-                        <p class="mt-1 text-xs text-gray-500">
-                            Mensagem #${Number(mensagem.id)}
-                        </p>
-                    </div>
+        </select>
 
-                    <span class="rounded-full bg-[#EAF8EF] px-3 py-1 text-xs font-bold text-[#16803D]">
-                        Interesse em adoção
-                    </span>
+    </div>
 
-                </div>
-
-                <div class="mt-4 rounded-xl bg-[#FFF8F3] p-4">
-
-                    <p class="text-xs font-bold text-[#795B49]">
-                        Remetente
-                    </p>
-
-                    <p class="mt-1 text-sm text-gray-700">
-                        ${escaparHTML(mensagem.remetente?.nome || 'Usuário')}
-                    </p>
-
-                    <p class="mt-4 text-xs font-bold text-[#795B49]">
-                        Mensagem
-                    </p>
-
-                    <p class="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
-                        ${escaparHTML(mensagem.conteudo || 'Sem conteúdo')}
-                    </p>
-
-                </div>
-
-                <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
-
-                    <span class="text-xs text-gray-500">
-                        Recebida em: ${escaparHTML(mensagem.data || 'Data não informada')}
-                    </span>
-
-                    <span class="rounded-full bg-[#FFEFE5] px-3 py-1 text-xs font-bold text-[#A94D1C]">
-                        Prioridade: ${escaparHTML(prioridade)}
-                    </span>
-
-                </div>
-
-            </article>
-        `;
-    });
-
-
-    // UNIR OS DOIS TIPOS DE REGISTRO
-    registros = [
-        ...registrosMensagens,
-        ...registrosAnimais
-    ].join('');
-
-    if (!registros) {
-        registros = mensagemVaziaTriagem(
-            'Nenhum animal ou pedido de adoção encontrado.'
-        );
-    }
-
-
-
-} else {
-
-    registros = mensagemVaziaTriagem('Setor não encontrado.');
-}
-
-
-
-    return `
-        <div class="mb-5 flex items-center gap-3">
-            <div class="flex h-11 w-11 items-center justify-center rounded-xl"
-                style="background:${config.cor}18;color:${config.cor}">
-                <i data-lucide="${config.icone}" class="h-5 w-5"></i>
-            </div>
-
-            <div>
-                <h3 class="text-lg font-black text-gray-900">${config.titulo}</h3>
-                <p class="mt-1 text-xs text-gray-500">${config.descricao}</p>
-            </div>
-        </div>
-
-        <div class="mb-4 flex items-center justify-between rounded-xl bg-[#FFEFE5] px-4 py-3">
-            <span class="text-xs font-bold text-[#795B49]">Registros neste setor</span>
-           <span class="text-sm font-black text-[#A94D1C]">
-    ${setor === 'mensagens'
-        ? mensagens.length
-        : setor === 'denuncias'
-            ? denuncias.length
-            : setor === 'doacoes'
-                ? (state.doacoes || []).length
-                : setor === 'adocoes'
-                    ? (state.adocoes || []).length +
-                      (state.mensagensAdocao || []).length
-                    : 0}
-</span>
 </div>
 
-        <div class="space-y-4">
-            ${registros}
+                <!-- FILTROS DA TRIAGEM -->
+                <div class="grid grid-cols-1 gap-3 border-b border-[#EADDD4] bg-[#FFFAF7] p-3 sm:grid-cols-2">
+
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-gray-600">
+                            Prioridade
+                        </label>
+
+                        <select
+                            onchange="atualizarFiltrosTriagem('prioridade', this.value)"
+                            class="w-full rounded-xl border border-[#E4B99E] bg-white p-2.5 text-xs text-gray-700">
+
+                            <option value="todas"
+                                ${state.filtroPrioridadeTriagem === 'todas' ? 'selected' : ''}>
+                                Todas
+                            </option>
+
+                            <option value="alta"
+                                ${state.filtroPrioridadeTriagem === 'alta' ? 'selected' : ''}>
+                                Alta
+                            </option>
+
+                            <option value="media"
+                                ${state.filtroPrioridadeTriagem === 'media' ? 'selected' : ''}>
+                                Média
+                            </option>
+
+                            <option value="baixa"
+                                ${state.filtroPrioridadeTriagem === 'baixa' ? 'selected' : ''}>
+                                Baixa
+                            </option>
+
+                            <option value="nao_definida"
+                                ${state.filtroPrioridadeTriagem === 'nao_definida' ? 'selected' : ''}>
+                                Não definida
+                            </option>
+
+                            <option value="nao_se_aplica"
+                                ${state.filtroPrioridadeTriagem === 'nao_se_aplica' ? 'selected' : ''}>
+                                Não se aplica
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-bold text-gray-600">
+                            Status
+                        </label>
+
+                        <select
+                            onchange="atualizarFiltrosTriagem('status', this.value)"
+                            class="w-full rounded-xl border border-[#E4B99E] bg-white p-2.5 text-xs text-gray-700">
+
+                            <option value="todos"
+                                ${state.filtroStatusTriagem === 'todos' ? 'selected' : ''}>
+                                Todos
+                            </option>
+
+                            ${[...new Set(registros.map(item => item.status))].map(status => {
+                                const valor = String(status)
+                                    .normalize('NFD')
+                                    .replace(/[\u0300-\u036f]/g, '')
+                                    .trim()
+                                    .toLowerCase()
+                                    .replace(/\s+/g, '_');
+
+                                return `
+                                    <option value="${escaparHTML(valor)}"
+                                        ${state.filtroStatusTriagem === valor ? 'selected' : ''}>
+                                        ${escaparHTML(status)}
+                                    </option>
+                                `;
+                            }).join('')}
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="max-h-[650px] space-y-2 overflow-y-auto p-3">
+                    ${lista}
+                </div>
+
+            </section>
+
+            <!-- PAINEL DE DETALHES -->
+            <section
+                id="painel-detalhes-triagem"
+                class="min-h-[450px] overflow-hidden rounded-2xl border border-[#E4B99E]/50 bg-white shadow-sm">
+
+                ${selecionado
+                    ? renderDetalhesRegistroTriagem(setor, selecionado.tipo, selecionado.original)
+                    : `
+                        <div class="flex min-h-[450px] flex-col items-center justify-center p-6 text-center">
+                            <i data-lucide="inbox" class="h-12 w-12 text-gray-300"></i>
+                            <p class="mt-3 text-sm font-bold text-gray-600">
+                                Nenhuma solicitação selecionada
+                            </p>
+                            <p class="mt-1 text-xs text-gray-400">
+                                Selecione um registro na lista para visualizar os detalhes.
+                            </p>
+                        </div>
+                    `
+                }
+
+            </section>
+
         </div>
     `;
 }
+
+
+/* =====================================================
+   SELECIONAR REGISTRO DA TRIAGEM
+===================================================== */
+
+function abrirRegistroTriagem(setor, tipo, id) {
+
+    state.registroSelecionadoTriagem = {
+        setor,
+        tipo,
+        id
+    };
+
+    const conteudo = document.getElementById('conteudo-setor-triagem');
+
+    if (!conteudo) return;
+
+    conteudo.innerHTML = renderConteudoSetorTriagem(setor);
+
+    atualizarIcones();
+}
+
+/* =====================================================
+   ATUALIZAR FILTROS DA TRIAGEM
+===================================================== */
+
+function atualizarFiltrosTriagem(tipo, valor) {
+
+    if (tipo === 'prioridade') {
+        state.filtroPrioridadeTriagem = valor;
+    }
+
+    if (tipo === 'status') {
+        state.filtroStatusTriagem = valor;
+    }
+
+    const conteudo = document.getElementById(
+        'conteudo-setor-triagem'
+    );
+
+    if (!conteudo) return;
+
+    conteudo.innerHTML = renderConteudoSetorTriagem(
+        state.setorTriagemAtual || 'mensagens'
+    );
+
+    atualizarIcones();
+}
+
+window.atualizarFiltrosTriagem = atualizarFiltrosTriagem;
+
+/* =====================================================
+   BUSCAR REGISTROS NA CENTRAL DE TRIAGEM
+===================================================== */
+
+function atualizarBuscaTriagem(valor) {
+
+    state.buscaTriagem = valor;
+
+    const conteudo = document.getElementById(
+        'conteudo-setor-triagem'
+    );
+
+    if (!conteudo) return;
+
+    conteudo.innerHTML = renderConteudoSetorTriagem(
+        state.setorTriagemAtual || 'mensagens'
+    );
+
+    atualizarIcones();
+
+    // Manter o cursor no campo de pesquisa
+    const campoBusca = document.getElementById(
+        'busca-registros-triagem'
+    );
+
+    if (campoBusca) {
+        campoBusca.focus();
+        campoBusca.setSelectionRange(
+            valor.length,
+            valor.length
+        );
+    }
+}
+
+window.atualizarBuscaTriagem = atualizarBuscaTriagem;
+
+/* =====================================================
+   ATUALIZAR ORDENAÇÃO DA CENTRAL DE TRIAGEM
+===================================================== */
+
+function atualizarOrdenacaoTriagem(valor) {
+
+    state.ordenacaoTriagem = valor;
+
+    const conteudo = document.getElementById(
+        'conteudo-setor-triagem'
+    );
+
+    if (!conteudo) return;
+
+    conteudo.innerHTML = renderConteudoSetorTriagem(
+        state.setorTriagemAtual || 'mensagens'
+    );
+
+    atualizarIcones();
+}
+
+window.atualizarOrdenacaoTriagem = atualizarOrdenacaoTriagem;
+
+/* =====================================================
+   DETALHES DA SOLICITAÇÃO SELECIONADA
+===================================================== */
+
+function renderDetalhesRegistroTriagem(setor, tipo, item) {
+
+    let triagem = item.triagem;
+
+    if (Array.isArray(triagem)) {
+        triagem = triagem[0] || null;
+    }
+
+    const titulo = tipo === 'mensagem'
+        ? item.assunto || 'Mensagem recebida'
+        : tipo === 'denuncia'
+            ? `Denúncia #${item.id}`
+            : tipo === 'doacao'
+                ? `Doação #${item.id_doacao}`
+                : tipo === 'animal'
+                    ? item.nome_animal || 'Animal cadastrado'
+                    : item.assunto || 'Interesse em adoção';
+
+    let detalhes = '';
+
+    if (tipo === 'mensagem' || tipo === 'mensagemAdocao') {
+
+        detalhes = `
+            <div class="space-y-4">
+
+                <div class="rounded-xl bg-[#FFF8F3] p-4">
+                    <p class="text-xs font-bold text-gray-500">REMETENTE</p>
+                    <p class="mt-1 text-sm font-bold text-gray-800">
+                        ${escaparHTML(item.remetente?.nome || 'Usuário')}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold text-gray-500">MENSAGEM</p>
+                    <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-gray-700">
+                        ${escaparHTML(item.conteudo || item.mensagem || 'Sem conteúdo disponível.')}
+                    </p>
+                </div>
+
+                ${item.data ? `
+                    <p class="text-xs text-gray-500">
+                        Recebida em: ${escaparHTML(item.data)}
+                    </p>
+                ` : ''}
+
+            </div>
+        `;
+
+    } else if (tipo === 'denuncia') {
+
+        detalhes = `
+            <div class="space-y-4">
+
+                <div class="rounded-xl bg-[#FFF8F3] p-4">
+                    <p class="text-xs font-bold text-gray-500">TIPO DE OCORRÊNCIA</p>
+                    <p class="mt-1 text-sm font-bold text-gray-800">
+                        ${escaparHTML(item.tipo || 'Não informado')}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold text-gray-500">DESCRIÇÃO</p>
+                    <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-gray-700">
+                        ${escaparHTML(item.descricao || 'Sem descrição.')}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div class="rounded-xl bg-gray-50 p-3">
+                        <p class="text-xs font-bold text-gray-500">URGÊNCIA</p>
+                        <p class="mt-1 text-sm font-bold text-gray-800">
+                            ${escaparHTML(item.urgencia || 'Não informada')}
+                        </p>
+                    </div>
+
+                    <div class="rounded-xl bg-gray-50 p-3">
+                        <p class="text-xs font-bold text-gray-500">STATUS</p>
+                        <p class="mt-1 text-sm font-bold text-gray-800">
+                            ${escaparHTML(item.status || 'Recebida')}
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-xs font-bold text-gray-500">ENDEREÇO</p>
+                    <p class="mt-1 text-sm text-gray-700">
+                        ${escaparHTML(item.endereco || 'Não informado')}
+                    </p>
+                </div>
+
+            </div>
+        `;
+
+    } else if (tipo === 'doacao') {
+
+        detalhes = `
+            <div class="space-y-4">
+
+                <div class="rounded-xl bg-[#FFF8EF] p-4">
+                    <p class="text-xs font-bold text-gray-500">VALOR DA DOAÇÃO</p>
+                    <p class="mt-2 text-2xl font-black text-[#D97706]">
+                        ${Number(item.valor || 0).toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                        })}
+                    </p>
+                </div>
+
+                <p class="text-sm text-gray-700">
+                    <strong>Tipo:</strong>
+                    ${escaparHTML(item.tipo_doacao || 'Não informado')}
+                </p>
+
+                <p class="text-sm text-gray-700">
+                    <strong>Destino:</strong>
+                    ${escaparHTML(item.descricao_item || 'Não informado')}
+                </p>
+
+                <p class="text-sm text-gray-700">
+                    <strong>Pagamento:</strong>
+                    ${escaparHTML(item.tipo_pagamento || 'Não informado')}
+                </p>
+
+                <p class="text-sm text-gray-700">
+                    <strong>Status:</strong>
+                    ${escaparHTML(item.status_pagamento || 'Pendente')}
+                </p>
+
+            </div>
+        `;
+
+    } else if (tipo === 'animal') {
+
+        detalhes = `
+            <div class="space-y-4">
+
+                ${item.url_midia ? `
+                    <img
+                        src="${escaparHTML(item.url_midia)}"
+                        alt="Foto de ${escaparHTML(item.nome_animal || 'animal')}"
+                        class="max-h-64 w-full rounded-xl object-cover"
+                    >
+                ` : ''}
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <div class="rounded-xl bg-gray-50 p-3">
+                        <p class="text-xs font-bold text-gray-500">RAÇA</p>
+                        <p class="mt-1 text-sm text-gray-800">
+                            ${escaparHTML(item.raca_animal || 'Não informada')}
+                        </p>
+                    </div>
+
+                    <div class="rounded-xl bg-gray-50 p-3">
+                        <p class="text-xs font-bold text-gray-500">IDADE</p>
+                        <p class="mt-1 text-sm text-gray-800">
+                            ${escaparHTML(item.idade_aproximada || 'Não informada')}
+                        </p>
+                    </div>
+
+                    <div class="rounded-xl bg-gray-50 p-3">
+                        <p class="text-xs font-bold text-gray-500">PORTE</p>
+                        <p class="mt-1 text-sm text-gray-800">
+                            ${escaparHTML(item.porte || 'Não informado')}
+                        </p>
+                    </div>
+
+                    <div class="rounded-xl bg-gray-50 p-3">
+                        <p class="text-xs font-bold text-gray-500">SAÚDE</p>
+                        <p class="mt-1 text-sm text-gray-800">
+                            ${escaparHTML(item.status_saude || 'Não informada')}
+                        </p>
+                    </div>
+
+                </div>
+
+                <p class="text-sm text-gray-700">
+                    <strong>Status:</strong>
+                    ${escaparHTML(item.status || 'Cadastrado')}
+                </p>
+
+            </div>
+        `;
+    }
+
+    let areaIA = '';
+
+    if (triagem) {
+
+        areaIA = `
+            <div class="mt-6 rounded-2xl border border-[#E4B99E]/60 bg-[#FFF8F3] p-4">
+
+                <div class="flex items-center gap-2">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#D97745]">
+                        <i data-lucide="sparkles" class="h-5 w-5"></i>
+                    </span>
+
+                    <div>
+                        <p class="text-sm font-black text-gray-800">
+                            Análise do Gemini
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            Sugestão automática para revisão da ONG
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-3">
+
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">CATEGORIA</p>
+                        <p class="mt-1 text-sm font-bold text-gray-800">
+                            ${escaparHTML(triagem.selo_categoria || 'Não informada')}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">SUBCATEGORIA</p>
+                        <p class="mt-1 text-sm text-gray-700">
+                            ${escaparHTML(triagem.subcategoria || 'Não informada')}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">PRIORIDADE SUGERIDA</p>
+                        <p class="mt-1 text-sm font-bold text-gray-800">
+                            ${escaparHTML(triagem.prioridade || 'Não informada')}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">RESUMO DA IA</p>
+                        <p class="mt-1 text-sm leading-6 text-gray-700">
+                            ${escaparHTML(triagem.resumo_ia || 'Sem resumo disponível.')}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-bold text-gray-500">JUSTIFICATIVA</p>
+                        <p class="mt-1 text-xs leading-5 text-gray-600">
+                            ${escaparHTML(triagem.justificativa_ia || 'Não informada.')}
+                        </p>
+                    </div>
+
+                </div>
+
+                ${formularioEdicaoTriagemCentral(triagem)}
+
+            </div>
+        `;
+
+    } else if (tipo === 'mensagem' || tipo === 'denuncia') {
+
+        areaIA = `
+            <div class="mt-6 rounded-2xl border border-dashed border-[#E4B99E] p-4">
+
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sparkles" class="h-5 w-5 text-[#D97745]"></i>
+                    <p class="text-sm font-black text-gray-800">
+                        Análise com inteligência artificial
+                    </p>
+                </div>
+
+                <p class="mt-2 text-xs leading-5 text-gray-500">
+                    Esta solicitação ainda não possui uma análise do Gemini.
+                </p>
+
+                <button
+                    type="button"
+                    onclick="${tipo === 'mensagem'
+                        ? `analisarMensagemIA(${Number(item.id)})`
+                        : `analisarDenunciaIA(${Number(item.id)})`
+                    }"
+                    class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl ${tipo === 'mensagem' ? 'bg-[#0600A9]' : 'bg-[#E00808]'} px-4 py-3 text-xs font-bold text-white hover:opacity-90">
+
+                    <i data-lucide="sparkles" class="h-4 w-4"></i>
+                    Analisar com IA
+
+                </button>
+
+            </div>
+        `;
+    }
+
+    let botaoExcluir = '';
+
+    if (tipo === 'mensagem') {
+        botaoExcluir = `
+            <button onclick="excluirMensagemTriagem(${Number(item.id)})"
+                class="rounded-xl border border-red-200 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50">
+                Excluir mensagem
+            </button>
+        `;
+    }
+
+    if (tipo === 'denuncia') {
+        botaoExcluir = `
+            <button onclick="excluirDenuncia(${Number(item.id)})"
+                class="rounded-xl border border-red-200 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50">
+                Excluir denúncia
+            </button>
+        `;
+    }
+
+    if (tipo === 'doacao') {
+        botaoExcluir = `
+            <button onclick="excluirDoacaoTriagem(${Number(item.id_doacao)})"
+                class="rounded-xl border border-red-200 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50">
+                Excluir doação
+            </button>
+        `;
+    }
+
+    if (tipo === 'animal') {
+        botaoExcluir = `
+            <button onclick="excluirAnimalAdocao(${Number(item.id_animal)})"
+                class="rounded-xl border border-red-200 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50">
+                Excluir animal
+            </button>
+        `;
+    }
+
+    return `
+        <div class="p-5 md:p-6">
+
+            <div class="flex flex-wrap items-start justify-between gap-3 border-b border-[#EADDD4] pb-4">
+
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-[#D97745]">
+                        Detalhes do atendimento
+                    </span>
+
+                    <h3 class="mt-2 text-lg font-black text-gray-900">
+                        ${escaparHTML(titulo)}
+                    </h3>
+                </div>
+
+                <span class="rounded-full bg-[#FFEFE5] px-3 py-1.5 text-[10px] font-bold text-[#A94D1C]">
+                    ${escaparHTML(item.status || 'Recebido')}
+                </span>
+
+            </div>
+
+            <div class="py-5">
+                ${detalhes}
+                ${areaIA}
+            </div>
+
+            ${botaoExcluir ? `
+                <div class="flex justify-end border-t border-[#EADDD4] pt-4">
+                    ${botaoExcluir}
+                </div>
+            ` : ''}
+
+        </div>
+    `;
+}
+
 
 /* =====================================================
    FORMULÁRIO DE EDIÇÃO DA TRIAGEM
@@ -9303,167 +10076,6 @@ function atualizarStatusDenuncia(
 
 }
 
-
-/* =========================================================
-   GERENCIAR DOAÇÕES
-========================================================= */
-
-function renderGerenciarDoacoes() {
-
-    const dados = [
-
-        [
-            'R$ 8.420',
-            'Doações financeiras',
-            'hand-heart'
-        ],
-
-        [
-            '214',
-            'Itens recebidos',
-            'package'
-        ],
-
-        [
-            '12',
-            'Campanhas ativas',
-            'megaphone'
-        ],
-
-        [
-            '37',
-            'Pedidos atendidos',
-            'check-check'
-        ]
-
-    ];
-
-
-    return `
-
-        <div
-            class="
-                mx-auto
-                w-full
-                max-w-[1180px]
-                p-4
-                md:p-7
-            "
-        >
-
-            <div class="mb-6">
-
-                <h2
-                    class="
-                        text-2xl
-                        font-black
-                        text-gray-900
-                    "
-                >
-                    Gerenciar doações
-                </h2>
-
-
-                <p
-                    class="
-                        mt-1.5
-                        text-[13px]
-                        text-gray-500
-                    "
-                >
-                    Acompanhe campanhas e recursos recebidos.
-                </p>
-
-            </div>
-
-
-            <div
-                class="
-                    grid
-                    gap-5
-                    md:grid-cols-2
-                    xl:grid-cols-4
-                "
-            >
-
-                ${
-                    dados
-                        .map(
-                            item => `
-
-                                <div
-                                    class="
-                                        rounded-2xl
-                                        border
-                                        border-[#E4B99E]/40
-                                        bg-white
-                                        p-5
-                                        shadow-sm
-
-                                        transition-all
-                                        duration-300
-
-                                        hover:-translate-y-1
-                                        hover:shadow-xl
-                                    "
-                                >
-
-                                    <div
-                                        class="
-                                            flex
-                                            h-10
-                                            w-10
-                                            items-center
-                                            justify-center
-                                            rounded-xl
-                                            bg-orange-50
-                                            text-pet-orange
-                                        "
-                                    >
-
-                                        <i
-                                            data-lucide="${item[2]}"
-                                            class="h-5 w-5"
-                                        ></i>
-
-                                    </div>
-
-
-                                    <p
-                                        class="
-                                            mt-4
-                                            text-2xl
-                                            font-black
-                                        "
-                                    >
-                                        ${item[0]}
-                                    </p>
-
-
-                                    <p
-                                        class="
-                                            mt-1
-                                            text-xs
-                                            text-gray-500
-                                        "
-                                    >
-                                        ${item[1]}
-                                    </p>
-
-                                </div>
-
-                            `
-                        )
-                        .join('')
-                }
-
-            </div>
-
-        </div>
-
-    `;
-
-}
 
 
 /* =========================================================
@@ -11827,3 +12439,1580 @@ async function baixarBoletoPDF() {
     };
 
 })();
+
+
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+    const notificacao = document.createElement('div');
+
+    notificacao.textContent = mensagem;
+
+    notificacao.style.cssText = `
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        z-index: 100000;
+        padding: 16px 22px;
+        border-radius: 12px;
+        color: white;
+        background: ${tipo === 'erro' ? '#E00808' : '#228B55'};
+        font-family: Roboto, sans-serif;
+        font-size: 14px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        max-width: 350px;
+    `;
+
+    document.body.appendChild(notificacao);
+
+    setTimeout(() => {
+        notificacao.remove();
+    }, 3500);
+}
+
+
+
+async function renderBancoRacoes() {
+    const conteudo = document.getElementById('conteudo');
+
+    conteudo.innerHTML = `
+        <div class="p-5 space-y-6">
+
+            <div class="bg-white border border-gray-200 rounded-lg p-5">
+                <h3 class="text-lg font-semibold text-gray-800">
+                    Cadastrar nova necessidade
+                </h3>
+                <p class="text-sm text-gray-500 mt-1">
+                    Informe os dados da necessidade de alimentação da ONG.
+                </p>
+
+                <form id="formBancoRacoes" class="mt-5 space-y-4">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Tipo de ração *
+                            </label>
+                            <input name="tipo_racao" required
+                                placeholder="Ex.: Ração para cães adultos"
+                                class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Quantidade *
+                            </label>
+                            <input name="quantidade" type="number"
+                                min="0.01" step="0.01" required
+                                placeholder="Informe a quantidade"
+                                class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Unidade *
+                            </label>
+                            <select name="unidade" required
+                                class="w-full border border-gray-300 rounded-md p-3 bg-white focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                <option value="">Selecione</option>
+                                <option value="kg">Kg</option>
+                                <option value="pacotes">Pacotes</option>
+                                <option value="sacos">Sacos</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Local de entrega *
+                            </label>
+                            <input name="local_entrega" required
+                                placeholder="Informe o local de entrega"
+                                class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Informações adicionais
+                        </label>
+                        <textarea name="descricao" rows="3"
+                            placeholder="Detalhes sobre a necessidade..."
+                            class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-orange-300"></textarea>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit"
+                            class="bg-[#0600A9] hover:bg-blue-900 text-white px-6 py-3 rounded-md font-semibold transition">
+                            Cadastrar necessidade
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+
+                <div class="p-5 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        Necessidades cadastradas
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Consulte e gerencie as necessidades registradas pela ONG.
+                    </p>
+                </div>
+
+                <div id="listaBancoRacoes" class="overflow-x-auto p-4">
+                    <p class="text-sm text-gray-500">Carregando...</p>
+                </div>
+
+            </div>
+        </div>
+    `;
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token') ||
+        JSON.parse(localStorage.getItem('centralpet_perfil') || '{}').access_token;
+
+    async function carregarNecessidades() {
+        const lista = document.getElementById('listaBancoRacoes');
+
+        try {
+            const resposta = await fetch('/php/buscarBancoRacoes.php', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok || !resultado.sucesso) {
+                throw new Error(resultado.mensagem || 'Erro ao carregar dados.');
+            }
+
+            const registros = resultado.dados || [];
+
+            if (!registros.length) {
+                lista.innerHTML = `
+                    <p class="text-gray-500 text-sm py-5 text-center">
+                        Nenhuma necessidade cadastrada.
+                    </p>
+                `;
+                return;
+            }
+
+            lista.innerHTML = `
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-100 text-gray-700">
+                        <tr>
+                            <th class="p-3 font-semibold">Tipo de ração</th>
+                            <th class="p-3 font-semibold">Quantidade</th>
+                            <th class="p-3 font-semibold">Local de entrega</th>
+                            <th class="p-3 font-semibold">Cadastro</th>
+                            <th class="p-3 font-semibold">Situação</th>
+                            <th class="p-3 font-semibold text-center">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-200">
+                        ${registros.map(item => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-3 text-gray-800 font-medium">
+                                    ${escaparHTML(item.tipo_racao)}
+                                    ${item.descricao ? `
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            ${escaparHTML(item.descricao)}
+                                        </p>
+                                    ` : ''}
+                                </td>
+
+                                <td class="p-3 text-gray-700 whitespace-nowrap">
+                                    ${escaparHTML(item.quantidade)} ${escaparHTML(item.unidade)}
+                                </td>
+
+                                <td class="p-3 text-gray-700">
+                                    ${escaparHTML(item.local_entrega)}
+                                </td>
+
+                                <td class="p-3 text-gray-600 whitespace-nowrap">
+                                    ${item.data_cadastro
+                                        ? new Date(item.data_cadastro).toLocaleDateString('pt-BR')
+                                        : '—'}
+                                </td>
+
+                                <td class="p-3">
+                                    <span class="inline-block px-2 py-1 rounded text-xs font-semibold
+                                        ${item.status === 'Aberta'
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : item.status === 'Atendida'
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-gray-200 text-gray-700'}">
+                                        ${escaparHTML(item.status)}
+                                    </span>
+                                </td>
+
+                                <td class="p-3">
+                                    <div class="flex justify-center gap-2">
+                                        <button
+                                            onclick="editarNecessidadeRacao(${item.id_banco})"
+                                            class="bg-blue-900 hover:bg-blue-800 text-white px-3 py-2 rounded-md text-xs font-medium">
+                                            Editar
+                                        </button>
+
+                                        <button
+                                            onclick="excluirNecessidadeRacao(${item.id_banco})"
+                                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-xs font-medium">
+                                            Excluir
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+        } catch (erro) {
+            const aviso = document.createElement('div');
+            aviso.className = 'bg-red-100 text-red-700 p-4 rounded-lg font-semibold';
+            aviso.textContent = '✕ ' + erro.message;
+
+            conteudo.prepend(aviso);
+            setTimeout(() => aviso.remove(), 4000);
+        }
+    }
+
+    document.getElementById('formBancoRacoes').addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+
+        const formulario = evento.currentTarget;
+        const dados = Object.fromEntries(new FormData(formulario).entries());
+        dados.quantidade = Number(dados.quantidade);
+
+        try {
+            const resposta = await fetch('/php/salvarBancoRacoes.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok || !resultado.sucesso) {
+                throw new Error(resultado.mensagem || 'Não foi possível cadastrar.');
+            }
+
+            formulario.reset();
+            await carregarNecessidades();
+
+            const aviso = document.createElement('div');
+            aviso.className = 'bg-green-100 text-green-800 p-4 rounded-lg font-semibold';
+            aviso.textContent = '✓ Necessidade cadastrada com sucesso!';
+
+            conteudo.prepend(aviso);
+            setTimeout(() => aviso.remove(), 4000);
+
+        } catch (erro) {
+            const aviso = document.createElement('div');
+            aviso.className = 'bg-red-100 text-red-700 p-4 rounded-lg font-semibold';
+            aviso.textContent = '✕ ' + erro.message;
+
+            conteudo.prepend(aviso);
+            setTimeout(() => aviso.remove(), 4000);
+        }
+    });
+
+    await carregarNecessidades();
+}
+
+
+async function excluirNecessidadeRacao(id) {
+    const conteudo = document.getElementById('conteudo');
+
+    const modal = document.createElement('div');
+
+    modal.id = 'modalExcluirRacao';
+
+    modal.className = `
+        fixed inset-0 z-50 flex items-center justify-center
+        bg-black bg-opacity-50 p-4
+    `;
+
+    modal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+
+            <div class="text-center mb-5">
+                <div class="text-4xl mb-3">🐾</div>
+
+                <h2 class="text-xl font-bold text-gray-800">
+                    Excluir necessidade?
+                </h2>
+
+                <p class="text-gray-500 mt-2">
+                    Tem certeza de que deseja excluir esta necessidade
+                    do Banco de Rações?
+                </p>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="cancelarExclusaoRacao"
+                    class="flex-1 border border-gray-300 rounded-lg py-3 font-semibold">
+                    Cancelar
+                </button>
+
+                <button id="confirmarExclusaoRacao"
+                    class="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-lg py-3 font-semibold">
+                    Excluir
+                </button>
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('cancelarExclusaoRacao')
+        .onclick = () => modal.remove();
+
+    document.getElementById('confirmarExclusaoRacao')
+        .onclick = async () => {
+
+        const botao = document.getElementById('confirmarExclusaoRacao');
+
+        botao.disabled = true;
+        botao.textContent = 'Excluindo...';
+
+        const token =
+            sessionStorage.getItem('centralpet_access_token') ||
+            localStorage.getItem('supabase_token') ||
+            JSON.parse(localStorage.getItem('centralpet_perfil') || '{}').access_token;
+
+        try {
+            const resposta = await fetch(
+                `/php/excluirBancoRacoes.php?id=${id}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok || !resultado.sucesso) {
+                throw new Error(
+                    resultado.mensagem || 'Erro ao excluir necessidade.'
+                );
+            }
+
+            modal.remove();
+
+            renderBancoRacoes();
+
+        } catch (erro) {
+            botao.disabled = false;
+            botao.textContent = 'Excluir';
+
+            const mensagem = document.createElement('p');
+            mensagem.className = 'text-red-600 text-sm text-center mt-3';
+            mensagem.textContent = erro.message;
+
+            modal.querySelector('.bg-white').appendChild(mensagem);
+        }
+    };
+}
+
+async function editarNecessidadeRacao(id) {
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    try {
+        const resposta = await fetch('/php/buscarBancoRacoes.php', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(resultado.mensagem || 'Erro ao buscar necessidade.');
+        }
+
+        const item = (resultado.dados || []).find(
+            registro => Number(registro.id_banco) === Number(id)
+        );
+
+        if (!item) {
+            throw new Error('Necessidade não encontrada.');
+        }
+
+        const modal = document.createElement('div');
+
+        modal.id = 'modalEditarRacao';
+        modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4';
+
+        modal.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg">
+                <h2 class="text-xl font-bold mb-4">Editar necessidade 🐾</h2>
+
+                <form id="formEditarRacao" class="space-y-3">
+
+                    <input name="tipo_racao" required
+                        value="${escaparHTML(item.tipo_racao)}"
+                        placeholder="Tipo de ração"
+                        class="w-full border rounded-lg p-3">
+
+                    <input name="quantidade" type="number"
+                        min="0.01" step="0.01" required
+                        value="${item.quantidade}"
+                        placeholder="Quantidade"
+                        class="w-full border rounded-lg p-3">
+
+                    <select name="unidade" required
+                        class="w-full border rounded-lg p-3">
+                        <option value="kg" ${item.unidade === 'kg' ? 'selected' : ''}>Kg</option>
+                        <option value="pacotes" ${item.unidade === 'pacotes' ? 'selected' : ''}>Pacotes</option>
+                        <option value="sacos" ${item.unidade === 'sacos' ? 'selected' : ''}>Sacos</option>
+                    </select>
+
+                    <input name="local_entrega" required
+                        value="${escaparHTML(item.local_entrega)}"
+                        placeholder="Local de entrega"
+                        class="w-full border rounded-lg p-3">
+
+                    <textarea name="descricao"
+                        placeholder="Informações adicionais"
+                        class="w-full border rounded-lg p-3">${escaparHTML(item.descricao || '')}</textarea>
+
+                    <div class="flex gap-3">
+                        <button type="button" id="cancelarEdicaoRacao"
+                            class="flex-1 border rounded-lg py-3 font-semibold">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                            class="flex-1 bg-blue-600 text-white rounded-lg py-3 font-semibold">
+                            Salvar alterações
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        document.getElementById('cancelarEdicaoRacao').onclick = () => {
+            modal.remove();
+        };
+
+        document.getElementById('formEditarRacao').addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+
+            const formulario = evento.currentTarget;
+            const botao = formulario.querySelector('button[type="submit"]');
+            const dados = Object.fromEntries(new FormData(formulario).entries());
+
+            dados.quantidade = Number(dados.quantidade);
+
+            botao.disabled = true;
+            botao.textContent = 'Salvando...';
+
+            try {
+                const resposta = await fetch(`/php/atualizarBancoRacoes.php?id=${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await resposta.json();
+
+                if (!resposta.ok || !resultado.sucesso) {
+                    throw new Error(resultado.mensagem || 'Erro ao atualizar necessidade.');
+                }
+
+                modal.remove();
+                await renderBancoRacoes();
+
+            } catch (erro) {
+                botao.disabled = false;
+                botao.textContent = 'Salvar alterações';
+
+                const aviso = document.createElement('p');
+                aviso.className = 'text-red-600 text-sm font-semibold';
+                aviso.textContent = erro.message;
+
+                formulario.appendChild(aviso);
+            }
+        });
+
+    } catch (erro) {
+        const aviso = document.createElement('div');
+        aviso.className = 'bg-red-100 text-red-700 p-4 rounded-xl font-semibold';
+        aviso.textContent = '✕ ' + erro.message;
+
+        document.getElementById('conteudo').prepend(aviso);
+        setTimeout(() => aviso.remove(), 4000);
+    }
+}
+
+
+async function renderBancoRacoesUsuario() {
+    const conteudo = document.getElementById('conteudo');
+
+    conteudo.innerHTML = `
+        <div class="p-5 space-y-5">
+            <p class="text-gray-600">
+                Veja quais ONGs precisam de ração e confira como ajudar.
+            </p>
+
+            <div id="listaBancoRacoesUsuario" class="space-y-4">
+                <p class="text-gray-500">Carregando necessidades...</p>
+            </div>
+        </div>
+    `;
+
+    const lista = document.getElementById('listaBancoRacoesUsuario');
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    try {
+        const resposta = await fetch('/php/buscarBancoRacoes.php', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(resultado.mensagem || 'Erro ao carregar necessidades.');
+        }
+
+        const registros = resultado.dados || [];
+
+        if (registros.length === 0) {
+            lista.innerHTML = `
+                <div class="bg-white rounded-xl p-6 text-center shadow">
+                    <p class="text-gray-600">
+                        Nenhuma necessidade de ração cadastrada no momento.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        lista.innerHTML = registros.map(item => `
+            <div class="bg-white rounded-xl shadow p-5 space-y-3">
+                <div class="flex justify-between items-start gap-3">
+                    <div>
+    <h3 class="text-lg font-bold text-gray-800">
+        ${escaparHTML(item.tipo_racao)}
+    </h3>
+
+    <p class="text-sm text-orange-600 font-semibold mt-1">
+        ONG responsável: ${escaparHTML(item.nome_ong || 'Não identificada')}
+    </p>
+</div>
+                    <span class="text-sm font-semibold ${
+                        item.status === 'Aberta'
+                            ? 'text-orange-600'
+                            : 'text-green-700'
+                    }">
+                        ${escaparHTML(item.status)}
+                    </span>
+                </div>
+
+                <p>
+                    <strong>Quantidade necessária:</strong>
+                    ${escaparHTML(item.quantidade)} ${escaparHTML(item.unidade)}
+                </p>
+
+                <p>
+                    <strong>Local de entrega:</strong>
+                    ${escaparHTML(item.local_entrega)}
+                </p>
+
+                ${
+                    item.descricao
+                        ? `<p class="text-gray-600">${escaparHTML(item.descricao)}</p>`
+                        : ''
+                }
+
+${
+    item.status === 'Aberta'
+        ? item.interesse_enviado
+            ? `
+                <button
+                    type="button"
+                    disabled
+                    class="w-full bg-gray-200 text-gray-600 font-semibold py-3 rounded-lg cursor-not-allowed">
+                    ✓ Interesse já enviado
+                </button>
+            `
+            : `
+                <button
+                    type="button"
+                    onclick="demonstrarInteresseRacao(${item.id_banco})"
+                    class="w-full bg-[#0600A9] hover:bg-blue-900 text-white font-bold py-3 rounded-lg transition">
+                    ❤️ Tenho interesse em doar
+                </button>
+            `
+        : ''
+}
+            </div>
+        `).join('');
+
+    } catch (erro) {
+        lista.innerHTML = `
+            <p class="bg-red-100 text-red-700 p-4 rounded-xl">
+                ${escaparHTML(erro.message)}
+            </p>
+        `;
+    }
+}
+
+async function demonstrarInteresseRacao(idBanco) {
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    try {
+        const resposta = await fetch('/php/salvarInteresseRacao.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id_banco: idBanco
+            })
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(resultado.mensagem || 'Não foi possível registrar seu interesse.');
+        }
+
+        await renderBancoRacoesUsuario();
+
+        const aviso = document.createElement('div');
+        aviso.className = 'bg-green-100 text-green-800 p-4 rounded-xl font-semibold';
+        aviso.textContent = '❤️ Seu interesse foi enviado para a ONG!';
+
+        document.getElementById('conteudo').prepend(aviso);
+
+        setTimeout(() => aviso.remove(), 4000);
+
+    } catch (erro) {
+        const aviso = document.createElement('div');
+        aviso.className = 'bg-red-100 text-red-700 p-4 rounded-xl font-semibold';
+        aviso.textContent = '✕ ' + erro.message;
+
+        document.getElementById('conteudo').prepend(aviso);
+
+        setTimeout(() => aviso.remove(), 4000);
+    }
+}
+
+window.demonstrarInteresseRacao = demonstrarInteresseRacao;
+
+async function renderInteressesRacao() {
+    const conteudo = document.getElementById('conteudo');
+
+    conteudo.innerHTML = `
+        <div class="p-5 space-y-5">
+            <div id="listaInteressesRacao" class="space-y-4">
+                <p class="text-gray-500">Carregando interesses...</p>
+            </div>
+        </div>
+    `;
+
+    const lista = document.getElementById('listaInteressesRacao');
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    try {
+        const resposta = await fetch('/php/buscarInteressesRacao.php', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        console.log('Resposta do interesse:', resultado);
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(resultado.mensagem || 'Erro ao carregar interesses.');
+        }
+
+        const interesses = resultado.dados || [];
+
+        if (interesses.length === 0) {
+            lista.innerHTML = `
+                <div class="bg-white rounded-xl shadow p-6 text-center">
+                    <p class="text-gray-600">
+                        Nenhum usuário demonstrou interesse nas necessidades de ração ainda.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        lista.innerHTML = interesses.map(item => `
+            <div class="bg-white rounded-xl shadow p-5 space-y-3">
+
+                <div class="flex justify-between items-start gap-3">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        ${escaparHTML(item.nome_usuario)}
+                    </h3>
+
+                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold">
+                        ${escaparHTML(item.status)}
+                    </span>
+                </div>
+
+                <p>
+                    <strong>Ração:</strong>
+                    ${escaparHTML(item.tipo_racao)}
+                </p>
+
+                <p>
+                    <strong>Quantidade solicitada:</strong>
+                    ${escaparHTML(item.quantidade)} ${escaparHTML(item.unidade)}
+                </p>
+
+                <p class="text-sm text-gray-500">
+                    Interesse registrado em:
+                    ${new Date(item.data_interesse).toLocaleString('pt-BR')}
+                </p>
+
+            <button
+    type="button"
+    onclick="abrirMensagemInteresseRacao('${escaparHTML(item.id_usuario)}', ${Number(item.id_banco)}, '${escaparHTML(item.tipo_racao)}')"
+    class="bg-[#0600A9] hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-lg transition"
+>
+    Enviar mensagem
+</button>
+
+${
+    item.status !== 'Doação recebida'
+        ? `
+            <button
+                type="button"
+                onclick="confirmarRecebimentoRacao(${Number(item.id_interesse)})"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-lg transition"
+            >
+                ✓ Confirmar recebimento
+            </button>
+        `
+        : `
+            <span class="text-green-700 font-bold">
+                ✓ Doação recebida
+            </span>
+        `
+}
+
+            </div>
+        `).join('');
+
+    } catch (erro) {
+        lista.innerHTML = `
+            <p class="bg-red-100 text-red-700 p-4 rounded-xl">
+                ${escaparHTML(erro.message)}
+            </p>
+        `;
+    }
+}
+
+
+async function confirmarRecebimentoRacao(idInteresse) {
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token');
+
+    if (!token) {
+        mostrarAviso(
+            'Sessão expirada',
+            'Faça login novamente.'
+        );
+        return;
+    }
+
+    try {
+
+        const resposta = await fetch('/php/confirmarRecebimentoRacao.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id_interesse: idInteresse
+            })
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.mensagem ||
+                'Não foi possível confirmar o recebimento.'
+            );
+        }
+
+        await renderInteressesRacao();
+
+        mostrarAviso(
+            'Recebimento confirmado!',
+            'A doação foi recebida e a necessidade de ração foi concluída.'
+        );
+
+    } catch (erro) {
+
+        console.error('Erro ao confirmar recebimento:', erro);
+
+        mostrarAviso(
+            'Erro na confirmação',
+            erro.message
+        );
+    }
+}
+
+window.confirmarRecebimentoRacao = confirmarRecebimentoRacao;
+
+
+
+function abrirMensagemInteresseRacao(idUsuario, idBanco, tipoRacao) {
+
+    document.getElementById('modalMensagemRacao')?.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'modalMensagemRacao';
+
+    modal.className =
+        'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50';
+
+    modal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-5">
+
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">
+                    Conversar sobre a doação 🐾
+                </h2>
+
+                <button
+                    type="button"
+                    id="fecharModalRacao"
+                    class="text-gray-500 hover:text-red-600 text-2xl"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <p class="text-gray-600">
+                Entre em contato com o usuário interessado na ração:
+                <strong>${escaparHTML(tipoRacao)}</strong>
+            </p>
+
+            <form id="formMensagemRacao" class="space-y-4">
+
+                <div>
+                    <label class="block font-semibold mb-1">
+                        Assunto
+                    </label>
+
+                    <input
+                        type="text"
+                        id="assuntoMensagemRacao"
+                        required
+                        maxlength="150"
+                        value="Combinar entrega de doação de ração"
+                        class="w-full border rounded-lg p-3"
+                    >
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">
+                        Mensagem
+                    </label>
+
+                    <textarea
+                        id="conteudoMensagemRacao"
+                        required
+                        rows="5"
+                        maxlength="5000"
+                        placeholder="Escreva uma mensagem para combinar a entrega da ração..."
+                        class="w-full border rounded-lg p-3"
+                    ></textarea>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-[#0600A9] hover:bg-blue-900 text-white font-bold py-3 rounded-lg"
+                >
+                    Enviar mensagem
+                </button>
+
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('fecharModalRacao').addEventListener('click', () => {
+        modal.remove();
+    });
+
+    modal.addEventListener('click', (evento) => {
+        if (evento.target === modal) {
+            modal.remove();
+        }
+    });
+
+    document.getElementById('formMensagemRacao').addEventListener('submit', async (evento) => {
+
+        evento.preventDefault();
+
+        const assunto = document.getElementById('assuntoMensagemRacao').value.trim();
+        const conteudo = document.getElementById('conteudoMensagemRacao').value.trim();
+
+        const token =
+            sessionStorage.getItem('centralpet_access_token') ||
+            localStorage.getItem('supabase_token');
+
+        if (!token) {
+            mostrarAviso('Sessão expirada', 'Faça login novamente.');
+            return;
+        }
+
+        if (!assunto || !conteudo) {
+            mostrarAviso('Campos obrigatórios', 'Preencha o assunto e a mensagem.');
+            return;
+        }
+
+        const botao = evento.currentTarget.querySelector('button[type="submit"]');
+        botao.disabled = true;
+        botao.textContent = 'Enviando...';
+
+        try {
+
+            const resposta = await fetch('/php/enviarMensagemRacao.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id_destinatario: idUsuario,
+                    id_banco: idBanco,
+                    assunto: assunto,
+                    conteudo: conteudo
+                })
+            });
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok || !resultado.sucesso) {
+                throw new Error(
+                    resultado.mensagem ||
+                    resultado.erro ||
+                    'Não foi possível enviar a mensagem.'
+                );
+            }
+
+            modal.remove();
+
+            mostrarAviso(
+                'Mensagem enviada!',
+                'A mensagem foi enviada ao usuário interessado.'
+            );
+
+        } catch (erro) {
+
+            console.error('Erro ao enviar mensagem sobre ração:', erro);
+
+            mostrarAviso('Erro ao enviar', erro.message);
+
+            botao.disabled = false;
+            botao.textContent = 'Enviar mensagem';
+        }
+    });
+}
+
+window.abrirMensagemInteresseRacao = abrirMensagemInteresseRacao;
+
+
+function renderVisaoGeralAdmin() {
+
+    return `
+
+        <div class="space-y-6">
+
+            <div>
+                <h2 class="text-2xl font-black text-gray-800">
+                    Bem-vindo à administração! 🐾
+                </h2>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Gerencie e acompanhe as atividades da Central Pet.
+                </p>
+            </div>
+
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-100 text-blue-700 p-3 rounded-xl">
+                            <i data-lucide="users"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-gray-500">Usuários cadastrados</p>
+                            <p id="admin-total-usuarios" class="text-2xl font-black text-gray-800">—</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-orange-100 text-orange-700 p-3 rounded-xl">
+                            <i data-lucide="building-2"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-gray-500">ONGs cadastradas</p>
+                            <p id="admin-total-ongs" class="text-2xl font-black text-gray-800">—</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-red-100 text-red-700 p-3 rounded-xl">
+                            <i data-lucide="shield-alert"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-gray-500">Denúncias recebidas</p>
+                            <p id="admin-total-denuncias" class="text-2xl font-black text-gray-800">—</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-pink-100 text-pink-700 p-3 rounded-xl">
+                            <i data-lucide="heart"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-gray-500">Animais para adoção</p>
+                            <p id="admin-total-adocoes" class="text-2xl font-black text-gray-800">—</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-green-100 text-green-700 p-3 rounded-xl">
+                            <i data-lucide="hand-heart"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-gray-500">Doações registradas</p>
+                            <p id="admin-total-doacoes" class="text-2xl font-black text-gray-800">—</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-yellow-100 text-yellow-700 p-3 rounded-xl">
+                            <i data-lucide="megaphone"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-gray-500">Campanhas cadastradas</p>
+                            <p id="admin-total-campanhas" class="text-2xl font-black text-gray-800">—</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+                <h3 class="font-black text-lg text-gray-800 mb-2">
+                    Central de administração
+                </h3>
+
+                <p class="text-sm text-gray-500">
+                    Utilize o menu lateral para gerenciar usuários,
+                    ONGs, denúncias, adoções, doações e relatórios.
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+async function carregarEstatisticasAdmin() {
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token') ||
+        JSON.parse(localStorage.getItem('centralpet_perfil') || '{}').access_token;
+
+    try {
+
+        const resposta = await fetch('/php/estatisticasAdmin.php', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.mensagem || 'Não foi possível carregar as estatísticas.'
+            );
+        }
+
+        const dados = resultado.estatisticas;
+
+        document.getElementById('admin-total-usuarios').textContent =
+            dados.total_usuarios;
+
+        document.getElementById('admin-total-ongs').textContent =
+            dados.total_ongs;
+
+        document.getElementById('admin-total-denuncias').textContent =
+            dados.total_denuncias;
+
+        document.getElementById('admin-total-adocoes').textContent =
+            dados.total_adocoes;
+
+        document.getElementById('admin-total-doacoes').textContent =
+            dados.total_doacoes;
+
+        document.getElementById('admin-total-campanhas').textContent =
+            dados.total_campanhas;
+
+    } catch (erro) {
+
+        console.error('Erro ao carregar estatísticas administrativas:', erro);
+
+        document.querySelectorAll(
+            '#admin-total-usuarios, #admin-total-ongs, #admin-total-denuncias, #admin-total-adocoes, #admin-total-doacoes, #admin-total-campanhas'
+        ).forEach(elemento => {
+            elemento.textContent = '!';
+        });
+
+    }
+}
+
+
+function renderUsuariosAdmin() {
+
+    return `
+        <div class="space-y-6">
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                    <div>
+                        <h2 class="text-xl font-black text-gray-800">
+                            Usuários cadastrados
+                        </h2>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Consulte os usuários registrados na Central Pet.
+                        </p>
+                    </div>
+
+                    <div class="relative w-full md:w-80">
+
+                        <i data-lucide="search"
+                           class="absolute left-3 top-3 text-gray-400 w-4 h-4">
+                        </i>
+
+                        <input
+                            type="text"
+                            id="pesquisarUsuariosAdmin"
+                            placeholder="Pesquisar por nome..."
+                            class="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-orange-200"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full text-sm text-left">
+
+                        <thead class="bg-gray-50 text-gray-600">
+
+                            <tr>
+                                <th class="p-4 font-semibold">Nome</th>
+                                <th class="p-4 font-semibold">Telefone</th>
+                                <th class="p-4 font-semibold">Cidade</th>
+                                <th class="p-4 font-semibold">Tipo de conta</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="listaUsuariosAdmin"
+                               class="divide-y divide-gray-100">
+
+                            <tr>
+                                <td colspan="4"
+                                    class="p-6 text-center text-gray-500">
+                                    Carregando usuários...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+async function carregarUsuariosAdmin() {
+
+    const lista = document.getElementById('listaUsuariosAdmin');
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token') ||
+        JSON.parse(localStorage.getItem('centralpet_perfil') || '{}').access_token;
+
+    try {
+
+        const resposta = await fetch('/php/listarUsuariosAdmin.php', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.mensagem || 'Erro ao buscar usuários.'
+            );
+        }
+
+        const usuarios = resultado.dados || [];
+
+        if (!usuarios.length) {
+            lista.innerHTML = `
+                <tr>
+                    <td colspan="4" class="p-6 text-center text-gray-500">
+                        Nenhum usuário cadastrado.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        lista.innerHTML = usuarios.map(usuario => `
+            <tr class="hover:bg-gray-50">
+
+                <td class="p-4 font-semibold text-gray-800">
+                    ${escaparHTML(usuario.nome || 'Nome não informado')}
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    ${escaparHTML(usuario.telefone || 'Não informado')}
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    ${escaparHTML(usuario.cidade || 'Não informada')}
+                </td>
+
+                <td class="p-4">
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
+                        Usuário comum
+                    </span>
+                </td>
+
+            </tr>
+        `).join('');
+
+        configurarPesquisaUsuariosAdmin();
+
+    } catch (erro) {
+
+        console.error('Erro ao carregar usuários:', erro);
+
+        lista.innerHTML = `
+            <tr>
+                <td colspan="4" class="p-6 text-center text-red-600">
+                    ${escaparHTML(erro.message)}
+                </td>
+            </tr>
+        `;
+
+    }
+}
+
+
+function configurarPesquisaUsuariosAdmin() {
+
+    const campo = document.getElementById('pesquisarUsuariosAdmin');
+    const lista = document.getElementById('listaUsuariosAdmin');
+
+    if (!campo || !lista) return;
+
+    campo.addEventListener('input', () => {
+
+        const pesquisa = campo.value.toLowerCase().trim();
+
+        const linhas = lista.querySelectorAll('tr');
+
+        linhas.forEach(linha => {
+
+            const nome = linha.cells[0]?.textContent.toLowerCase() || '';
+
+            linha.style.display = nome.includes(pesquisa)
+                ? ''
+                : 'none';
+
+        });
+
+    });
+
+}
+
+
+function renderOngsAdmin() {
+
+    return `
+        <div class="space-y-6">
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                    <div>
+                        <h2 class="text-xl font-black text-gray-800">
+                            Organizações cadastradas
+                        </h2>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Consulte as ONGs registradas na Central Pet.
+                        </p>
+                    </div>
+
+                    <div class="relative w-full md:w-80">
+
+                        <i data-lucide="search"
+                           class="absolute left-3 top-3 text-gray-400 w-4 h-4">
+                        </i>
+
+                        <input
+                            type="text"
+                            id="pesquisarOngsAdmin"
+                            placeholder="Pesquisar por nome ou razão social..."
+                            class="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-orange-200"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full text-sm text-left">
+
+                        <thead class="bg-gray-50 text-gray-600">
+
+                            <tr>
+                                <th class="p-4 font-semibold">Nome</th>
+                                <th class="p-4 font-semibold">Razão social</th>
+                                <th class="p-4 font-semibold">CNPJ</th>
+                                <th class="p-4 font-semibold">Telefone</th>
+                                <th class="p-4 font-semibold">Cidade</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="listaOngsAdmin"
+                               class="divide-y divide-gray-100">
+
+                            <tr>
+                                <td colspan="5"
+                                    class="p-6 text-center text-gray-500">
+                                    Carregando organizações...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+async function carregarOngsAdmin() {
+
+    const lista = document.getElementById('listaOngsAdmin');
+
+    const token =
+        sessionStorage.getItem('centralpet_access_token') ||
+        localStorage.getItem('supabase_token') ||
+        JSON.parse(localStorage.getItem('centralpet_perfil') || '{}').access_token;
+
+    try {
+
+        const resposta = await fetch('/php/listarOngsAdmin.php', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            throw new Error(
+                resultado.mensagem || 'Erro ao buscar ONGs.'
+            );
+        }
+
+        const ongs = resultado.dados || [];
+
+        if (!ongs.length) {
+            lista.innerHTML = `
+                <tr>
+                    <td colspan="5" class="p-6 text-center text-gray-500">
+                        Nenhuma ONG cadastrada.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        lista.innerHTML = ongs.map(ong => `
+            <tr class="hover:bg-gray-50">
+
+                <td class="p-4 font-semibold text-gray-800">
+                    ${escaparHTML(ong.nome || 'Não informado')}
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    ${escaparHTML(ong.razao_social || 'Não informada')}
+                </td>
+
+                <td class="p-4 text-gray-600 whitespace-nowrap">
+                    ${escaparHTML(ong.cnpj || 'Não informado')}
+                </td>
+
+                <td class="p-4 text-gray-600 whitespace-nowrap">
+                    ${escaparHTML(ong.telefone || 'Não informado')}
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    ${escaparHTML(ong.cidade || 'Não informada')}
+                </td>
+
+            </tr>
+        `).join('');
+
+        configurarPesquisaOngsAdmin();
+
+    } catch (erro) {
+
+        console.error('Erro ao carregar ONGs:', erro);
+
+        lista.innerHTML = `
+            <tr>
+                <td colspan="5" class="p-6 text-center text-red-600">
+                    ${escaparHTML(erro.message)}
+                </td>
+            </tr>
+        `;
+
+    }
+}
+
+
+function configurarPesquisaOngsAdmin() {
+
+    const campo = document.getElementById('pesquisarOngsAdmin');
+    const lista = document.getElementById('listaOngsAdmin');
+
+    if (!campo || !lista) return;
+
+    campo.addEventListener('input', () => {
+
+        const pesquisa = campo.value.toLowerCase().trim();
+
+        const linhas = lista.querySelectorAll('tr');
+
+        linhas.forEach(linha => {
+
+            const nome = linha.cells[0]?.textContent.toLowerCase() || '';
+            const razaoSocial = linha.cells[1]?.textContent.toLowerCase() || '';
+
+            const corresponde =
+                nome.includes(pesquisa) ||
+                razaoSocial.includes(pesquisa);
+
+            linha.style.display = corresponde ? '' : 'none';
+
+        });
+
+    });
+
+}
